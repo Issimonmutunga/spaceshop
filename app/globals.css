@@ -1,0 +1,141 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-quiet: var(--ink-quiet);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+
+  --radius-lg: var(--radius-lg);
+  --radius-md: var(--radius-md);
+  --radius-sm: var(--radius-sm);
+
+  --shadow-sheet: var(--shadow-1);
+  --blur-sheet: var(--blur);
+
+  --font-sans: var(--font-sans);
+
+  --text-display: var(--text-display);
+  --text-title: var(--text-title);
+  --text-body: var(--text-body);
+  --text-caption: var(--text-caption);
+
+  --ease-out: var(--ease-out);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    background: var(--ground);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  /* Numerals tabular, everywhere. */
+  time,
+  .tabular,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  /* Frosted sheet. Depth from layering and blur, not borders. */
+  .frosted {
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+  }
+
+  .safe-t {
+    padding-top: var(--safe-top);
+  }
+
+  .safe-b {
+    padding-bottom: var(--safe-bottom);
+  }
+
+  /* One slow pulse on arrival, then still. */
+  @keyframes locus-pulse {
+    0% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.35;
+      transform: scale(1.9);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.9);
+    }
+  }
+
+  .pulse-once {
+    animation: locus-pulse 900ms var(--ease-out) 1 both;
+  }
+
+  /* Shimmer while AI is prefilling. Never a spinner with text. */
+  @keyframes locus-shimmer {
+    0% {
+      background-position: -180% 0;
+    }
+    100% {
+      background-position: 180% 0;
+    }
+  }
+
+  .shimmer {
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in srgb, var(--ink) 8%, transparent) 50%,
+      transparent 70%
+    );
+    background-size: 220% 100%;
+    background-repeat: no-repeat;
+    animation: locus-shimmer 1.4s linear infinite;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    display: block !important;
+  }
+}

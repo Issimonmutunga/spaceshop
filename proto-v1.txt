@@ -1,0 +1,350 @@
+# LOCUS — Design Document
+
+*Working name. "Where is it?" answered in one glance.*
+
+Audience: an autonomous coding agent with access to the owner's GitHub and a free-tier Vercel account. Build the minimal prototype described here, in the milestone order given. Keep everything small, quiet and fast.
+
+---
+
+## 1. Product in one paragraph
+
+Locus is a spatial memory for physical things. A user maps a space (supermarket, shop, house, office) as a loose spatial graph of zones, places and items. They add an item by taking a photo and placing it in a location. Later they search "10mm spanner" and get a huge, calm answer ("Garage → Blue toolbox → Drawer 2") plus optional step-by-step walking directions. No indoor positioning hardware: a phone camera, QR labels and a lightweight database are enough.
+
+**Primary use cases**
+1. A supermarket manager or staff member who needs to find or direct someone to any product in seconds.
+2. A household finding cables, tools, medicines, keys.
+
+**Success test:** from opening the app to seeing the location of an item takes under 5 seconds and at most 2 taps.
+
+---
+
+## 2. Constraints (hard)
+
+- Deploy target: Vercel Hobby (free) tier. Code lives in a GitHub repo. No paid services, no other accounts.
+- **Client-side first.** All core features must work offline with data in the browser (IndexedDB). The backend is optional and thin.
+- No authentication. Roles are a view switch, not security. Do not build login.
+- AI is **not** built now, but every AI touchpoint must exist as a stubbed interface (section 10).
+- Installable PWA, mobile-first (phone is the main device), usable on desktop.
+- Verify current Vercel free-tier limits before relying on any of them (function duration, request body size, storage).
+
+---
+
+## 3. Tech stack
+
+| Concern | Choice | Note |
+|---|---|---|
+| Framework | Next.js (App Router) + TypeScript | Vercel-native; API routes = the light backend |
+| Styling | Tailwind CSS + CSS variables for tokens | Tokens defined in section 8 |
+| Local DB | Dexie (IndexedDB) | Source of truth in the browser |
+| State | Zustand | UI state only; data reads via Dexie live queries |
+| Search | MiniSearch (fuzzy, prefix, synonyms) | Runs fully client-side |
+| Map canvas | Plain SVG + pointer events (pan/zoom via transform) | No map library; the space is not geographic |
+| Motion | Framer Motion (springs) or CSS only | Must respect `prefers-reduced-motion` |
+| QR generate | `qrcode` | Printable labels |
+| QR scan | `BarcodeDetector` API with `html5-qrcode` fallback | Camera via `getUserMedia` |
+| Image handling | Canvas resize to 900px longest side, WebP ~0.8, plus 160px thumbnail | Stored as Blobs in IndexedDB |
+| PWA | Web manifest + service worker (`serwist` or hand-rolled) | Offline shell and data |
+| Tests | Vitest for graph/route logic; Playwright smoke test for the core flow | |
+
+**Light backend (optional layer, build last)**
+- `POST /api/sync` and `GET /api/sync?code=XXXX`: store and fetch one JSON snapshot of a space's metadata (no images) keyed by a short random "space code". Storage: Upstash Redis or Vercel Blob via Vercel's free integrations. The space code is a shared secret; there is no auth.
+- `POST /api/extract`: AI stub. Returns a mocked item description after a fake delay (section 10).
+- Images stay on-device in this prototype. Do not push images through serverless functions (body size and duration limits).
+
+---
+
+## 4. Mental model and data model
+
+**Hierarchy (deliberately shallow, expandable later):**
+`Space → Zone → Place → Item`
+
+- **Space**: a whole shop or home. An effectively infinite 2D canvas measured in meters.
+- **Zone**: a room, aisle or area (Garage, Aisle 4, Pharmacy).
+- **Place**: a container or fixture that holds items (shelf, drawer, toolbox, bay). May have a `slot` label ("Level 3", "Drawer 2").
+- **Item**: a thing.
+
+Later "generalizations" (categories, containers inside containers) will be added via `parentId`, so model it as a tree from day one.
+
+```ts
+type ID = string; // nanoid
+
+interface Node {
+  id: ID;
+  spaceId: ID;
+  kind: 'zone' | 'place' | 'point';  // 'point' = survey station / waypoint
+  parentId: ID | null;                 // tree hierarchy
+  name: string;
+  x: number; y: number;                // meters, canvas coordinates
+  w?: number; h?: number;              // footprint in meters (zone/place)
+  rotation?: number;                   // degrees, 0 = up
+  landmark?: boolean;                  // distinctive node used in directions
+  qr: string;                          // short code printed on the label
+  createdAt: number; updatedAt: number;
+}
+
+interface Edge {                       // walkable connection between nodes
+  id: ID; spaceId: ID;
+  from: ID; to: ID;
+  distance: number;                    // meters (computed or user-entered)
+  bearing?: number;                    // degrees clockwise from canvas up
+}
+
+interface Item {
+  id: ID; spaceId: ID;
+  placeId: ID;                         // node of kind 'place'
+  slot?: string;                       // "Level 3", "Left compartment"
+  name: string;
+  tags: string[];
+  qty?: number;
+  photoId?: ID;                        // Blob record
+  createdAt: number; updatedAt: number;
+}
+
+interface Event {                      // append-only log: add | move | remove | edit
+  id: ID; spaceId: ID; itemId: ID;
+  type: 'add' | 'move' | 'remove' | 'edit';
+  from?: ID; to?: ID; at: number;
+}
+
+interface Settings { role: 'manager' | 'staff' | 'visitor'; units: 'm' | 'ft'; theme: 'auto'|'light'|'dark'; }
+```
+
+Removed items are soft-deleted (status flag) so undo and history work. Every mutation writes an `Event`.
+
+---
+
+## 5. Spatial system ("collect points", survey-style)
+
+The space is an unbounded canvas. The user builds a rough map by **collecting points**, the way a surveyor runs a traverse, but with more directions.
+
+**Three ways to place a point (all in v1):**
+1. **Drop and drag** — tap "+" on the map, a point appears at the canvas centre; drag to position. Snaps to a 0.5 m grid (toggle off).
+2. **Bearing and distance** — from a selected point: enter a compass-style direction (large dial, 8 presets N/NE/E…, free rotate) and a distance (pace counter or number stepper). The new point is computed from the previous one. This is the survey traverse.
+3. **Stand-and-mark** — the user stands at the real location, opens the app, taps "I'm here", and picks or creates the nearest zone/place. Position is inferred from the last point plus the entered bearing/distance. (No GPS or sensors; optional device compass is a later add-on.)
+
+**Rules**
+- Points link automatically into a walkable graph: consecutive points create an Edge; the user can also connect any two points.
+- Zones and places attach to points (or are points). Zones can be drawn as simple rectangles or polygons (v1: rectangles with rotation).
+- The canvas has no hard boundary; the viewport auto-fits the content with generous margin.
+- Accept imperfection. Distances are approximate; the graph is what matters, not geometric truth. (Future: loop-closure adjustment for closed traverses; sensor-assisted stepping.)
+
+---
+
+## 6. Wayfinding — "scientific principles" made concrete
+
+Directions are computed on the graph, then phrased for human memory, not for machines.
+
+**Algorithm**
+- Single item: A* or Dijkstra on the edge graph from the user's current point (default: the entrance node) to the place node.
+- Multi-item list (shopping list or pick list): nearest-neighbour ordering of stops, refined with 2-opt. Small lists only; must finish in under 100 ms.
+
+**Principles to implement**
+| Principle | How it shows up |
+|---|---|
+| Lynch's five elements (paths, edges, districts, nodes, landmarks) | Zones = districts, aisles = paths, junctions = nodes, `landmark` nodes are named in instructions ("past the bakery") |
+| Landmark-based, egocentric instructions | "Turn left at Bakery", not "go north 12 m". Compass bearings never appear in directions |
+| Miller's chunking (≈ 4 ± 1) | Never show more than 4 steps at once; long routes are grouped by zone |
+| Hick's law | One primary action per screen; at most 3 choices anywhere |
+| Fitts's law | Primary targets ≥ 56 px, placed in the thumb zone (bottom third) |
+| Progressive disclosure | Answer first; map second; history and details on demand |
+| Recognition over recall | Photos accompany every item and place; the user recognises rather than reads |
+| Serial position effect | Final step of any route is always the largest and most vivid: the item photo and its exact slot |
+| Gestalt proximity and common region | Items in one place are grouped by whitespace, not boxes |
+
+**Direction phrasing (templates)**
+- `Walk to {landmark}` → `Turn {left|right}` → `{place}, {slot}`
+- Distances are shown as a rough scale ("about 20 steps"), not exact meters.
+
+---
+
+## 7. Roles (view-only, no auth)
+
+Switch from a small control in settings and from a long-press on the app title. Store in `Settings.role`. Roles change **what is shown**, nothing else; all data stays accessible.
+
+| Role | Sees | Default landing |
+|---|---|---|
+| **Manager** (owner, supermarket manager, household admin) | Full map, edit mode, add/move/remove, QR label printing, activity history, sync | Search + map |
+| **Staff** (picker, shelf-stocker, family member) | Search, guide, quick add/move/remove, scan | Search |
+| **Visitor** (customer, guest) | Search and guide only, no edit affordances at all | Search, biggest type |
+
+Implementation: one `useRole()` hook and a `<Can action="edit-map">` wrapper. Do not scatter role checks through components.
+
+---
+
+## 8. Design language
+
+**Direction:** Japanese restraint (*ma*, empty space as a feature; *kanso*, simplicity; *shibui*, quiet elegance) combined with Apple-style figure-ground: one clear focal figure on a quiet ground, depth from layering and blur rather than borders.
+
+**Principles**
+1. **One figure per screen.** Everything else recedes.
+2. **Space is content.** Margins are generous; if in doubt, remove an element.
+3. **Text is minimal.** Prefer a photo, a shape or an icon over a word. Every label must earn its place. Target: under 12 words on a typical screen apart from item names.
+4. **Big where it matters.** The answer (the location) is set in display type; everything else is small and quiet.
+5. **Calm motion.** Elements move with physical, springy easing; nothing bounces for decoration.
+
+**Tokens (CSS variables)**
+```
+--ground:      #F6F5F1   /* warm paper; dark: #111112 */
+--surface:     #FFFFFF   /* raised layer;  dark: #1B1B1D */
+--ink:         #1A1A1C   /* primary text;  dark: #F2F2F0 */
+--ink-quiet:   #8A8A86   /* secondary text */
+--line:        #E7E5DF   /* hairlines, used sparingly */
+--accent:      #D9432B   /* shu vermilion — the ONLY accent; marks "the thing" */
+--radius-lg:   28px  --radius-md: 18px  --radius-sm: 12px
+--shadow-1:    0 1px 2px rgb(0 0 0 / .04), 0 8px 24px rgb(0 0 0 / .06)
+--blur:        saturate(1.6) blur(24px)   /* frosted sheets */
+```
+- Accent is used for exactly one thing per screen: the target (the pin, the primary button, the current step).
+- Typography: system stack (SF Pro on Apple, Inter fallback). Display 56–72 px / weight 600 / tight tracking for answers; title 28 px; body 17 px; caption 13 px. Numerals tabular. Sentence case everywhere.
+- Icons: 1.5 px stroke line icons (Lucide), no filled icons except the accent pin.
+- Photos: rounded `--radius-md`, no borders, soft shadow.
+- Dark mode: automatic, same hierarchy; accent stays.
+- Accessibility: contrast AA minimum, dynamic text sizing respected, all targets ≥ 44 px (primary 56 px), full keyboard support, reduced-motion path, screen-reader labels on every icon-only control.
+
+**Motion**
+- Springs: stiffness ~300, damping ~30. Durations 200–350 ms.
+- Shared-element transitions: tapping a search result lifts its photo into the result screen.
+- Map pin: one slow pulse on arrival, then still.
+- Light haptics on scan success and on "Got it".
+
+**Voice:** short, calm, lowercase-friendly. "Not found." "Added." "Moved." No exclamation marks, no jargon.
+
+---
+
+## 9. Screens and flows
+
+### 9.1 Home (Find)
+- A vast, empty ground. One oversized search field centred vertically, placeholder: *Where is…*
+- Under it, in quiet type, up to 3 recent searches as photo thumbnails (no text if a photo exists).
+- Bottom thumb zone: two round buttons only — **Scan** and **Add** (Add hidden for Visitor).
+- Typing shows results instantly (client-side MiniSearch); each result is a photo plus name plus one line of location.
+
+### 9.2 Answer
+- Full-screen figure: the location in display type, broken into three stacked lines:
+  `Garage` / `Blue toolbox` / `Drawer 2`
+- Item photo above, mini-map below with the accent pin. Nothing else.
+- One primary button: **Guide me**. One quiet secondary: **Moved it** (Staff/Manager).
+- If several matches: a horizontal snap carousel of photos; swipe to switch.
+
+### 9.3 Guide
+- One step per screen, giant arrow or landmark photo, 1 to 5 words: "Bakery. Turn left."
+- Progress as dots (max 4 visible, chunked by zone). Swipe or tap to advance. The final step shows the item photo and the exact slot, largest.
+- Optional: stays awake while guiding.
+
+### 9.4 Map (Manager and Staff; Visitor gets a read-only pan/zoom)
+- Full-bleed SVG canvas on `--ground`. Zones are soft rounded rectangles, places are small dots or shapes, edges are hairlines. Labels appear only at sufficient zoom.
+- Pan with one finger, zoom with pinch or wheel. Double-tap to fit.
+- Edit mode (Manager): bottom sheet with three tools — **Point**, **Zone**, **Connect**. Bearing-and-distance dial opens as a frosted sheet.
+- Selecting a node opens a low bottom sheet with its name, item photos and QR button.
+
+### 9.5 Add item (target: 3 taps)
+1. Tap **Add** → camera opens instantly, full-bleed viewfinder, one shutter button.
+2. After capture: the photo sits large; a single name field (AI will prefill later); the destination is pre-filled with the last place used, shown as a chip ("Garage › Blue toolbox"). Tap the chip to change it.
+3. **Done.** Item appears; a soft "Added." confirmation with undo for 5 seconds.
+- **Place mode:** scan a place's QR first; the camera stays open and each capture files into that place. The Add flow becomes: shutter, shutter, shutter, done.
+
+### 9.6 Scan
+- Camera with a minimal rounded frame. Scanning a place QR opens that place (its items as photos, plus "Add here"). Scanning an unknown code offers "Attach to a place".
+
+### 9.7 Move and remove
+- **Move:** on an item, tap **Moved it**, then scan the new place's QR or pick from a short recent-places list.
+- **Remove:** swipe an item left, or use **Took it**; both are soft deletes with undo. Quantity items decrement first.
+- Later methods (do not build now): barcode scan, voice, batch photo, AI-detected shelf photo.
+
+### 9.8 Place and labels (Manager)
+- Place page shows its QR at large size and a **Print** action producing an A4 sheet of labels (QR plus place name in large type). Print stylesheet is minimal.
+
+### 9.9 Settings
+- Role switcher (3 large segmented options), units, theme, export/import JSON, sync code (optional), reset. Nothing else.
+
+### 9.10 Empty and first-run states
+- First run: a single sentence and one button — "Set up a space." Offers **Start blank** or **Load demo** (supermarket or home). The demo must make the app feel alive immediately.
+
+---
+
+## 10. AI touchpoints (stubs now, real later)
+
+Define these interfaces in `/lib/ai` and wire the UI to them today with mocked implementations.
+
+```ts
+interface ExtractedItem {
+  name: string;
+  brand?: string;
+  category?: string;
+  size?: string;
+  tags: string[];
+  confidence: number; // 0..1
+}
+extractItem(image: Blob): Promise<ExtractedItem>       // mock: returns after 600 ms
+suggestPlace(item: ExtractedItem, space: Space): Promise<ID[]>  // mock: last used place
+answerQuery(text: string): Promise<{ itemIds: ID[] }>  // mock: falls back to MiniSearch
+```
+
+- UI rule: AI output only ever **prefills**; the user confirms with one tap. Show a subtle shimmer while waiting, never a spinner with text.
+- `/api/extract` proxies to a future model provider; keep provider keys in Vercel env vars, never in the client.
+
+---
+
+## 11. Search
+
+- Index item names, tags and place names. Fuzzy (edit distance 1–2), prefix matching, small built-in synonym map (e.g. spanner/wrench, biscuit/cookie).
+- Ranking: exact name > tag > place name; recency as tiebreaker.
+- Results in under 50 ms on 5,000 items. Reindex incrementally on mutation.
+
+---
+
+## 12. Repository layout
+
+```
+/app                 routes: / (find), /item/[id], /guide, /map, /scan, /settings, /api/*
+/components          ui primitives, Map, Sheet, PhotoCard, Pin, Dial
+/lib/db.ts           Dexie schema and queries
+/lib/graph.ts        graph build, A*, route ordering (pure, unit-tested)
+/lib/directions.ts   route → landmark-based steps
+/lib/search.ts       MiniSearch wrapper
+/lib/ai.ts           stubs from section 10
+/lib/qr.ts           generate / scan helpers
+/lib/image.ts        resize, thumbnail
+/styles/tokens.css   section 8 tokens
+/seed                supermarket.json, home.json
+/tests               vitest + playwright
+README.md            setup, deploy, how the spatial model works
+```
+
+---
+
+## 13. Milestones (agent works in order, one commit per milestone, deploy a Vercel preview after each)
+
+1. **Skeleton and design tokens** — Next.js + Tailwind + tokens, Home screen with the empty search field, light/dark, PWA manifest. *Accept:* looks deliberate and calm on a 390 px viewport.
+2. **Data layer and seed** — Dexie schema, seed loader, live queries, soft delete and events. *Accept:* demo supermarket loads with 60+ items.
+3. **Search and Answer** — MiniSearch, results, Answer screen with three-line location. *Accept:* find any seeded item in ≤ 2 taps.
+4. **Map** — SVG canvas, pan/zoom, render zones/places/edges, node bottom sheet. *Accept:* smooth at 60 fps with 300 nodes.
+5. **Map editing** — Point, Zone, Connect tools, bearing-and-distance dial, stand-and-mark. *Accept:* a user can map a 5-zone space in under 3 minutes.
+6. **Guide** — graph routing, landmark phrasing, one-step-per-screen UI. *Accept:* unit tests on routes; steps are chunked ≤ 4.
+7. **Add, move, remove, scan** — camera capture, image resize, Place mode, QR generate/print, QR scan, undo. *Accept:* Add flow is 3 taps; Place mode files 5 photos in under 30 seconds.
+8. **Roles** — role switcher and view gating through `<Can>`. *Accept:* Visitor sees no edit affordance anywhere.
+9. **Light backend** — `/api/sync` snapshot with space code, `/api/extract` stub, JSON export/import. *Accept:* second device loads the same space by code.
+10. **Polish** — motion, haptics, empty states, accessibility audit, Lighthouse PWA ≥ 90, README.
+
+---
+
+## 14. Non-goals for this prototype
+
+Authentication, permissions, multi-user live collaboration, real AI, barcode/voice adding, category hierarchy management UI, GPS or sensor positioning, 3D, payments, analytics, image cloud storage.
+
+---
+
+## 15. Agent working rules
+
+- Ask no questions unless blocked; make the smallest reasonable assumption and note it in the README.
+- Prefer deleting UI to adding UI. If a screen feels busy, cut until it feels empty, then stop.
+- Keep dependencies lean; justify any addition in the commit message.
+- Keep business logic (graph, directions, search) pure and tested, separate from components.
+- Never store secrets in the repo. Use Vercel environment variables.
+- After each milestone: run tests, push to GitHub, confirm the Vercel preview builds, and record what changed in a short CHANGELOG entry.
+
+---
+
+## 16. Roadmap (do not build now, but do not block)
+
+Real AI extraction and natural-language queries; hierarchy and generalizations (categories, nested containers); barcode/NFC/voice adding; multi-user sync with real auth; sensor-assisted step tracking and loop-closure map correction; shelf-photo bulk digitisation; restocking and expiry alerts; shopper-facing mode with a personal route through a shopping list.
