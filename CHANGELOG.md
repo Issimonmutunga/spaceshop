@@ -39,3 +39,23 @@ Notes
   `localStorage` so the first paint is right; domain data is IndexedDB only.
 - Playwright runs against a production build, because the service worker is
   deliberately not registered in development.
+
+## M3 — Search and Answer
+
+- `lib/search.ts`: MiniSearch over names, tags and place names, with a synonym
+  map, prefix and fuzzy matching, and our own ranking
+  (exact > prefix > contains > tag > place, recency only breaking ties).
+  Queries are normalised so `10mm` matches `10 mm` and `500mg` matches `500 mg`.
+- `lib/labels.ts`: the answer as three stacked lines, plus recent places.
+- `components/Glyph.tsx`, `components/ItemPhoto.tsx`: photos are Blobs in
+  IndexedDB; items without one get a calm paper glyph, so the demo recognises
+  things without shipping binary assets.
+- `components/MiniMap.tsx`: the quiet map under the answer, auto-fitted, with a
+  single accent pin.
+- `app/item/[id]`: the Answer screen. Photo, name, three-line location, a
+  matches carousel when a query is ambiguous, and two actions at most.
+- Home now searches as you type, shows up to three recent searches as photos, and
+  says "Not found." rather than an empty box.
+- Tests: 17 search cases (ranking, synonyms, fuzz, prefix, case and unit
+  insensitivity, 5,000 items under 50 ms) and 3 more Playwright cases covering
+  the two-tap answer, synonyms and the empty state. 33 tests in total.

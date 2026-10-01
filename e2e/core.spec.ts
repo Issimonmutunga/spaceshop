@@ -52,3 +52,31 @@ test("offline: the app shell still opens with data in IndexedDB", async ({ page,
   await expect(page.getByPlaceholder("Where is…")).toBeVisible();
   await context.setOffline(false);
 });
+
+test("find any item in two taps and read the three-line answer", async ({ page }) => {
+  await bootWithDemo(page);
+
+  await page.getByPlaceholder("Where is…").fill("chopped tomatoes");
+  const first = page.getByRole("link", { name: /Chopped tomatoes/ }).first();
+  await expect(first).toBeVisible();
+  await first.click();
+
+  // The answer: the item, then its location as stacked lines.
+  await expect(page.getByRole("heading", { name: "Chopped tomatoes" })).toBeVisible();
+  await expect(page.getByText("Aisle 1 Grocery", { exact: true })).toBeVisible();
+  await expect(page.getByText("Shelf 2 left", { exact: true })).toBeVisible();
+  await expect(page.getByText("Level 3", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Guide me" })).toBeVisible();
+});
+
+test("a synonym query still finds the thing", async ({ page }) => {
+  await bootWithDemo(page);
+  await page.getByPlaceholder("Where is…").fill("crisps");
+  await expect(page.getByRole("link", { name: /Salted crisps/ }).first()).toBeVisible();
+});
+
+test("no match says so quietly", async ({ page }) => {
+  await bootWithDemo(page);
+  await page.getByPlaceholder("Where is…").fill("zzzqqq");
+  await expect(page.getByText("Not found.")).toBeVisible();
+});
