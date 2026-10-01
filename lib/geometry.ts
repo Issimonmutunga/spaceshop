@@ -39,8 +39,13 @@ export const COMPASS = [
 /** A step is a comfortable stride. Distances are shown as steps, never metres. */
 export const STEP_METERS = 0.75;
 
+/**
+ * Rounds to a round number of steps, because "about twenty steps" is something
+ * people keep in their heads and "17 steps" is not. Sub-metre moves still get
+ * a plural count rather than "1 step".
+ */
 export const toSteps = (meters: number) =>
-  Math.max(1, Math.round(meters / STEP_METERS / 5) * 5);
+  Math.max(5, Math.round(meters / STEP_METERS / 5) * 5);
 
 export const stepPhrase = (meters: number) => `about ${toSteps(meters)} steps`;
 

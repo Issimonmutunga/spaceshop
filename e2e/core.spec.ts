@@ -1,13 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-
-/** The core flow: first run -> load demo -> find an item in two taps. */
-async function bootWithDemo(page: Page) {
-  await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Set up a space." })).toBeVisible();
-  await page.getByRole("button", { name: "Load demo" }).click();
-  await page.getByRole("button", { name: "Supermarket" }).click();
-  await expect(page.getByPlaceholder("Where is…")).toBeVisible();
-}
+import { expect, test } from "@playwright/test";
+import { bootWithDemo } from "./helpers";
 
 test("first run offers a space, and a demo loads with items", async ({ page }) => {
   await bootWithDemo(page);

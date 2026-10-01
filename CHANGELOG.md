@@ -59,3 +59,32 @@ Notes
 - Tests: 17 search cases (ranking, synonyms, fuzz, prefix, case and unit
   insensitivity, 5,000 items under 50 ms) and 3 more Playwright cases covering
   the two-tap answer, synonyms and the empty state. 33 tests in total.
+
+## M4 — The map
+
+- `lib/camera.ts`: a 2D camera in meters over a canvas with no boundary.
+  `fit`, `panBy`, `zoomAt` (anchored on the fingers), `toCanvas`/`fromCanvas`,
+  `rectPoints` and `hitTest` are pure functions, so panning and zooming are
+  tested without a browser. 27 cases, including the unit that bites:
+  `scale` is meters per pixel, never pixels per meter.
+- `lib/geometry.ts`: bearings clockwise from canvas up, `advance`, `turnBetween`,
+  bounds, and steps in a round scale ("about twenty steps", never metres).
+- `components/MapCanvas.tsx`: SVG. Drag to pan, pinch to zoom, wheel and
+  keyboard for desktop, auto-fits on open and keeps fitting as the data grows.
+  Zones as surfaces, places as small footprints with their names, landmarks as
+  dots, edges as quiet hairlines. A scale bar, and a `Fit` button.
+- `components/NodeSheet.tsx`: tap a node for its full details, the things in it,
+  what is inside it, and where it leads.
+- `/map`: the whole space and nothing else. `/place/[id]`: one place, on the
+  map, with everything in it, which is what the Answer's "This place" opens.
+- Notes
+  - One accent per screen: the selected node, or the answer's pin. Nothing else
+    is ever coloured.
+  - The name under a place is part of its tap target, because on a phone the
+    label is what people aim at.
+  - Two bugs the end-to-end tests caught and I would not have found by eye:
+    `fit` returned pixels per meter (collapsing a 40 m shop to a dot at the zoom
+    limit), and the label and stroke sizes were inverted, parking labels metres
+    off screen.
+- Tests: 27 camera and geometry cases, plus 2 Playwright cases that drag, fit
+  and tap the real map. 53 unit and 8 end-to-end in total.

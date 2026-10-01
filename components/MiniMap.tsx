@@ -2,7 +2,6 @@
 
 import { boundsOf } from "@/lib/geometry";
 import type { Node } from "@/lib/types";
-import { Glyph } from "./Glyph";
 
 /**
  * The quiet map under the answer. Static, auto-fitted, no interaction: the map
@@ -78,5 +77,3 @@ export default function MiniMap({
     </svg>
   );
 }
-
-export { Glyph };
