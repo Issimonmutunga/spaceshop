@@ -185,6 +185,44 @@ describe("hit testing", () => {
       hitTest([place], camera, below, size, { labelPad: 14 * camera.scale })?.id,
     ).toBe("p");
   });
+
+  it("treats the name above an area as part of it", () => {
+    const zone = node({ id: "z", kind: "zone", x: 0, y: 0, w: 6, h: 7 });
+    const above = { x: size.width / 2, y: size.height / 2 - 3.5 * 20 - 8 };
+    expect(hitTest([zone], camera, above, size)).toBeUndefined();
+    expect(
+      hitTest([zone], camera, above, size, { labelPadTop: 14 * camera.scale })?.id,
+    ).toBe("z");
+  });
+
+  it("prefers a place over the area it sits in, label taps included", () => {
+    // Seeded places have no stored size: they fall back to the same footprint
+    // the drawing uses, so a tap on the name picks the place and not the room.
+    const room = node({ id: "room", kind: "zone", x: 0, y: 0, w: 6, h: 7 });
+    const shelf = node({ id: "shelf", kind: "place", x: 0, y: -1.5 });
+    const pad = { labelPad: 14 * camera.scale, labelPadTop: 14 * camera.scale };
+    const middle = size.height / 2 - 1.5 * 20;
+    expect(hitTest([room, shelf], camera, { x: size.width / 2, y: middle }, size, pad)?.id).toBe(
+      "shelf",
+    );
+    // Its name sits about 0.7 m below its centre, still inside the room.
+    const onLabel = { x: size.width / 2, y: middle + 0.7 * 20 };
+    expect(hitTest([room, shelf], camera, onLabel, size, pad)?.id).toBe("shelf");
+  });
+
+  it("prefers a name to a shape it happens to overlap", () => {
+    // The name above the room sits right by the junction point at its top edge.
+    const room = node({ id: "room", kind: "zone", x: 0, y: 0, w: 6, h: 7 });
+    const door = node({ id: "door", kind: "point", x: 0, y: -3 });
+    const pad = { labelPad: 14 * camera.scale, labelPadTop: 14 * camera.scale };
+    const onRoomName = { x: size.width / 2, y: size.height / 2 - 3.5 * 20 - 4 };
+    expect(hitTest([room, door], camera, onRoomName, size, pad)?.id).toBe("room");
+    // The junction itself is still tappable.
+    expect(
+      hitTest([room, door], camera, { x: size.width / 2, y: size.height / 2 - 3 * 20 }, size, pad)
+        ?.id,
+    ).toBe("door");
+  });
 });
 
 describe("rectangles", () => {

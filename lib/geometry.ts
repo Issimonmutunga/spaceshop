@@ -60,6 +60,19 @@ export const formatDistance = (meters: number, units: "m" | "ft") => {
 export const snapToGrid = (value: number, step = 0.5) =>
   Math.round(value / step) * step;
 
+/** Default footprint of a place, in metres: a shoebox, not a room. */
+export const PLACE_SIZE = { w: 0.8, h: 0.6 } as const;
+
+/**
+ * The size of a node's footprint, in metres, for drawing and for tapping.
+ * Both must agree or a tap lands somewhere other than where it looks like it
+ * does, so they read the same fallback here rather than each guessing.
+ */
+export function sizeOf(node: Node): { w: number; h: number } {
+  if (node.kind === "point") return { w: 0, h: 0 };
+  return { w: node.w ?? PLACE_SIZE.w, h: node.h ?? PLACE_SIZE.h };
+}
+
 export interface Bounds {
   minX: number;
   minY: number;
@@ -74,8 +87,7 @@ export function boundsOf(nodes: Node[]): Bounds | null {
   let maxX = -Infinity;
   let maxY = -Infinity;
   for (const n of nodes) {
-    const w = n.kind === "point" ? 0 : (n.w ?? 1);
-    const h = n.kind === "point" ? 0 : (n.h ?? 1);
+    const { w, h } = sizeOf(n);
     minX = Math.min(minX, n.x - w / 2);
     maxX = Math.max(maxX, n.x + w / 2);
     minY = Math.min(minY, n.y - h / 2);

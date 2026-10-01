@@ -88,3 +88,43 @@ Notes
     off screen.
 - Tests: 27 camera and geometry cases, plus 2 Playwright cases that drag, fit
   and tap the real map. 53 unit and 8 end-to-end in total.
+
+## M5 — Editing the map
+
+- `lib/draft.ts`: the editing arithmetic as pure functions, so the rules can be
+  tested without a browser. `zoneAt` (deepest area containing a point),
+  `containsPoint`, `rectFromDrag` (snapped, with a floor so a stray tap is a
+  speck and not a room), `edgeMeasures`, `nextName`, `parentFor`, `problems` and
+  `canConnect` (areas do not link to areas).
+- `components/BearingDial.tsx`: a compass you turn with a finger or the arrow
+  keys, beside a distance field. It is how a measurement gets typed rather than
+  guessed, and it is also how a place gets placed from where you stand.
+- `components/MapEditor.tsx` and `/edit`: five tools on the left edge — Move,
+  Place, Area, Link, Stand. Drag out an area and its size is shown as you go; tap
+  two nodes to link them and the dial opens so a hand-measured number can replace
+  the drawn one; Stand marks where you are standing and the next place you draw
+  is measured and linked from it.
+- "Add a place here" on a selected area carries the room through to the new
+  place, so a place belongs to the room you were looking at rather than to
+  whatever the tap happened to land on.
+- `lib/db.ts`: `connect` now stores the bearing as well as the distance;
+  `updateEdge` keeps a hand-set measurement; `remeasureEdges` re-surveys the
+  links touching a node that moved, because a survey is only worth something if
+  the numbers still describe where things are. Unlinking is soft, for undo.
+- `components/NodeSheet.tsx`: the details scroll, the actions do not, so the
+  buttons under a busy node stay in the thumb zone.
+- Notes
+  - Editing is gated on `edit-map`, so a visitor gets a sentence, not a broken
+    toolbar.
+  - Three bugs the end-to-end tests caught, all of them invisible by eye:
+    the editor's gesture channel hit-tested without the label pad, so tapping a
+    shelf's name selected the room behind it; a node sheet grew tall enough to
+    push its own buttons off screen; and the camera ref was synced in a passive
+    effect, which swallowed the first tap after the map appeared.
+  - `sizeOf` in `lib/geometry.ts` is now the single source of footprint size for
+    both drawing and tapping, and `hitTest` prefers a name to a shape it overlaps
+    (a shelf in an aisle, a junction above a door).
+- Tests: 19 editing cases, 30 camera and geometry cases, 4 more database cases for
+  the link measurements, and 5 Playwright cases covering add-here, drawing an
+  area, stand-and-mark, linking by hand and the visitor lockout.
+  79 unit and 13 end-to-end in total.

@@ -1,5 +1,5 @@
 import type { Bounds } from "./geometry";
-import { boundsOf } from "./geometry";
+import { boundsOf, sizeOf } from "./geometry";
 import type { Node } from "./types";
 
 /**
@@ -87,55 +87,82 @@ export function panBy(camera: Camera, dx: number, dy: number): Camera {
 
 /** A rectangle drawn with rotation, as a polygon of points. */
 export function rectPoints(node: Node): Array<{ x: number; y: number }> {
-  const w = (node.w ?? 1) / 2;
-  const h = (node.h ?? 1) / 2;
+  const { w, h } = sizeOf(node);
+  const halfW = w / 2;
+  const halfH = h / 2;
   const angle = ((node.rotation ?? 0) * Math.PI) / 180;
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   return [
-    [-w, -h],
-    [w, -h],
-    [w, h],
-    [-w, h],
+    [-halfW, -halfH],
+    [halfW, -halfH],
+    [halfW, halfH],
+    [-halfW, halfH],
   ].map(([x, y]) => ({ x: node.x + x * cos - y * sin, y: node.y + x * sin + y * cos }));
 }
 
 /** The area a tap can land on: points get a finger-sized tolerance. */
-const areaOf = (node: Node) =>
-  node.kind === "point" ? 0 : Math.max(0.01, (node.w ?? 1) * (node.h ?? 1));
+const areaOf = (node: Node) => {
+  const { w, h } = sizeOf(node);
+  return node.kind === "point" ? 0 : Math.max(0.01, w * h);
+};
+
+/**
+ * How far below a footprint its label sits, in screen pixels. The label is part
+ * of the target: on a phone the name is what people aim at.
+ */
+export const LABEL_PAD_PX = 14;
 
 /**
  * True when a screen-space tap lands on a node, tightest target winning.
- * `labelPad` extends a footprint downwards, so the name under a place is part
- * of the same target: on a phone the label is what people aim at.
+ * `labelPad` and `labelPadTop` extend the footprint downwards and upwards so
+ * the name drawn beside it is part of the same target: on a phone the label is
+ * what people aim at.
+ *
+ * A name is aimed at more precisely than a shape is, so a tap that lands on a
+ * label always beats one that merely landed inside a bigger shape. Otherwise
+ * a shelf standing in an aisle steals the aisle's name, and the junction point
+ * above a door steals the room's.
  */
 export function hitTest(
   nodes: Node[],
   camera: Camera,
   point: { x: number; y: number },
   size: Size,
-  options: { tolerance?: number; labelPad?: number } = {},
+  options: { tolerance?: number; labelPad?: number; labelPadTop?: number } = {},
 ): Node | undefined {
-  const { tolerance = 22, labelPad = 0 } = options;
+  const { tolerance = 22, labelPad = 0, labelPadTop = 0 } = options;
   const world = fromCanvas(camera, point, size);
-  let best: Node | undefined;
-  let bestArea = Infinity;
+  let named: Node | undefined;
+  let namedArea = Infinity;
+  let solid: Node | undefined;
+  let solidArea = Infinity;
   for (const node of nodes) {
-    let inside: boolean;
+    const { w, h } = sizeOf(node);
+    const area = areaOf(node);
+    const withinWidth = Math.abs(world.x - node.x) <= w / 2;
+    let onShape: boolean;
     if (node.kind === "point") {
       // World meters divided by meters-per-pixel = screen pixels.
-      inside = Math.hypot(node.x - world.x, node.y - world.y) / camera.scale <= tolerance;
+      onShape = Math.hypot(node.x - world.x, node.y - world.y) / camera.scale <= tolerance;
     } else {
-      const dx = Math.abs(world.x - node.x) - (node.w ?? 1) / 2;
-      const dy = Math.abs(world.y - node.y) - (node.h ?? 1) / 2 - labelPad;
-      inside = dx <= 0 && dy <= 0;
+      onShape = withinWidth && Math.abs(world.y - node.y) <= h / 2;
     }
-    if (!inside) continue;
-    const area = areaOf(node);
-    if (area < bestArea) {
-      best = node;
-      bestArea = area;
+    if (onShape) {
+      if (area < solidArea) {
+        solid = node;
+        solidArea = area;
+      }
+      continue;
+    }
+    if (node.kind === "point") continue;
+    // Place names sit below their footprint, area names above it.
+    const below = world.y - (node.y + h / 2);
+    const above = node.y - h / 2 - world.y;
+    if (withinWidth && below <= labelPad && above <= labelPadTop && area < namedArea) {
+      named = node;
+      namedArea = area;
     }
   }
-  return best;
+  return named ?? solid;
 }

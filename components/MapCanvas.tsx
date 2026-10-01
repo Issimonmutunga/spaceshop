@@ -1,15 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   fit,
+  fromCanvas,
   hitTest,
+  LABEL_PAD_PX,
   panBy,
   rectPoints,
   zoomAt,
   type Camera,
   type Size,
 } from "@/lib/camera";
+import { sizeOf } from "@/lib/geometry";
 import type { Edge, ID, Item, Node } from "@/lib/types";
 
 /**
@@ -18,28 +21,50 @@ import type { Edge, ID, Item, Node } from "@/lib/types";
  *
  * One accent thing at a time: the selected node, or the answer's pin.
  */
+export interface Point {
+  x: number;
+  y: number;
+}
+
+/**
+ * Drag gestures, in world meters. The canvas already knows its camera, so it
+ * hands over coordinates and the node under the finger: no editor should ever
+ * have to reverse-engineer a transform.
+ */
+export interface DrawHandlers {
+  start: (world: Point, hit: Node | undefined) => void;
+  move: (world: Point) => void;
+  end: (world: Point, hit: Node | undefined) => void;
+}
+
 export default function MapCanvas({
   nodes,
   edges = [],
   items = [],
   selectedId = null,
   onSelect,
+  /** when set, drags draw instead of panning: the editor's gesture channel */
+  draw = null,
   targetId = null,
   fitKey = "",
   className = "",
   height,
+  overlay,
 }: {
   nodes: Node[];
   edges?: Edge[];
   items?: Item[];
   selectedId?: ID | null;
   onSelect?: (id: ID | null) => void;
+  draw?: DrawHandlers | null;
   /** the answer's node: drawn as the single accent */
   targetId?: ID | null;
   /** change this to re-fit, e.g. when the space or seed changes */
   fitKey?: string;
   className?: string;
   height?: number | string;
+  /** a draft shape or measure line, drawn above the map */
+  overlay?: React.ReactNode;
 }) {
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
   // The auto-fitted camera is derived, not stored, so it always matches the
@@ -50,8 +75,10 @@ export default function MapCanvas({
   const camera = (manual && manual.key === key && auto ? manual.camera : auto) ?? null;
 
   // Live ref: pointer moves must not read a camera captured at render time.
+  // A layout effect, not a passive one, so a tap in the first frame after the
+  // map appears finds a camera instead of being swallowed.
   const cameraRef = useRef<Camera | null>(camera);
-  useEffect(() => {
+  useLayoutEffect(() => {
     cameraRef.current = camera;
   }, [camera]);
   const origin = useRef({ left: 0, top: 0 });
@@ -74,6 +101,16 @@ export default function MapCanvas({
   const drag = useRef<{ last: Point; moved: number; at: number } | null>(null);
   const pinch = useRef<{ distance: number } | null>(null);
 
+  /**
+   * The name under a place and the name above an area are part of the target,
+   * so every tap is tested with that extra reach. `scale` is meters per pixel,
+   * hence pixels * scale meters.
+   */
+  const pad = (camera: Camera) => ({
+    labelPad: LABEL_PAD_PX * camera.scale,
+    labelPadTop: LABEL_PAD_PX * camera.scale,
+  });
+
   const local = (event: { clientX: number; clientY: number }): Point => ({
     x: event.clientX - origin.current.left,
     y: event.clientY - origin.current.top,
@@ -86,11 +123,18 @@ export default function MapCanvas({
   };
 
   const onPointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
+    const camera = cameraRef.current;
+    if (!camera) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    pointers.current.set(event.pointerId, local(event));
+    const point = local(event);
+    pointers.current.set(event.pointerId, point);
     if (pointers.current.size === 1) {
-      drag.current = { last: local(event), moved: 0, at: Date.now() };
+      drag.current = { last: point, moved: 0, at: Date.now() };
       pinch.current = null;
+      // In draw mode a finger means one thing only: edit, not navigate.
+      if (draw) {
+        draw.start(fromCanvas(camera, point, size), hitTest(nodes, camera, point, size, pad(camera)));
+      }
     } else if (pointers.current.size === 2) {
       drag.current = null;
       pinch.current = { distance: spread(pointers.current) };
@@ -111,6 +155,11 @@ export default function MapCanvas({
       return;
     }
 
+    if (draw) {
+      draw.move(fromCanvas(current, point, size));
+      return;
+    }
+
     if (!drag.current) return;
     const dx = point.x - drag.current.last.x;
     const dy = point.y - drag.current.last.y;
@@ -121,6 +170,15 @@ export default function MapCanvas({
 
   const onPointerUp = (event: React.PointerEvent<SVGSVGElement>) => {
     const point = local(event);
+    const camera = cameraRef.current;
+    if (draw) {
+      pointers.current.delete(event.pointerId);
+      if (pointers.current.size < 2) pinch.current = null;
+      if (camera) {
+        draw.end(fromCanvas(camera, point, size), hitTest(nodes, camera, point, size, pad(camera)));
+      }
+      return;
+    }
     const wasTap =
       drag.current !== null &&
       drag.current.moved < 8 &&
@@ -128,12 +186,8 @@ export default function MapCanvas({
       pointers.current.size === 1;
     pointers.current.delete(event.pointerId);
     if (pointers.current.size < 2) pinch.current = null;
-    const camera = cameraRef.current;
     if (!wasTap || !camera || !onSelect) return;
-    // The label below a place is part of its target: 14 screen px.
-    onSelect(
-      hitTest(nodes, camera, point, size, { labelPad: 14 * camera.scale })?.id ?? null,
-    );
+    onSelect(hitTest(nodes, camera, point, size, pad(camera))?.id ?? null);
   };
 
   const onWheel = (event: React.WheelEvent<SVGSVGElement>) => {
@@ -241,13 +295,14 @@ export default function MapCanvas({
               .filter((node) => node.kind === "place")
               .map((place) => {
                 const selected = place.id === selectedId;
+                const { w, h } = sizeOf(place);
                 return (
                   <g key={place.id} opacity={place.id === targetId ? 0.5 : 1}>
                     <rect
-                      x={place.x - (place.w ?? 0.8) / 2}
-                      y={place.y - (place.h ?? 0.6) / 2}
-                      width={place.w ?? 0.8}
-                      height={place.h ?? 0.6}
+                      x={place.x - w / 2}
+                      y={place.y - h / 2}
+                      width={w}
+                      height={h}
                       rx={0.12}
                       fill={selected ? "var(--accent-soft)" : "var(--surface-2)"}
                       stroke={selected ? "var(--accent)" : "var(--line)"}
@@ -255,7 +310,7 @@ export default function MapCanvas({
                     />
                     <text
                       x={place.x}
-                      y={place.y + (place.h ?? 0.6) / 2 + labelSize * 0.9}
+                      y={place.y + h / 2 + labelSize * 0.9}
                       textAnchor="middle"
                       fontSize={labelSize}
                       fill="var(--ink-quiet)"
@@ -264,8 +319,8 @@ export default function MapCanvas({
                     </text>
                     {(countByPlace.get(place.id) ?? 0) > 0 && (
                       <circle
-                        cx={place.x + (place.w ?? 0.8) / 2 + labelSize * 0.3}
-                        cy={place.y - (place.h ?? 0.6) / 2}
+                        cx={place.x + w / 2 + labelSize * 0.3}
+                        cy={place.y - h / 2}
                         r={labelSize * 0.3}
                         fill="var(--ink-quiet)"
                         opacity={0.6}
@@ -308,6 +363,7 @@ export default function MapCanvas({
           <ScaleBar camera={camera} />
         </div>
       )}
+      {overlay}
       <button
         type="button"
         onClick={() => setManual(null)}
@@ -317,11 +373,6 @@ export default function MapCanvas({
       </button>
     </div>
   );
-}
-
-interface Point {
-  x: number;
-  y: number;
 }
 
 /** A human scale bar: the biggest round distance that fits the width. */

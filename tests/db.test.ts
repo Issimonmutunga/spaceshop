@@ -1,7 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import supermarketSeed from "@/seed/supermarket.json";
 import homeSeed from "@/seed/home.json";
-import { db, addItem, removeItem, restoreItem, undoAdd, moveItem, connect, softDeleteNode } from "@/lib/db";
+import {
+  db,
+  addItem,
+  removeItem,
+  restoreItem,
+  undoAdd,
+  moveItem,
+  connect,
+  disconnect,
+  remeasureEdges,
+  softDeleteNode,
+  updateEdge,
+  updateNode,
+} from "@/lib/db";
 import { importSeedFile } from "@/lib/seed";
 import type { SeedFile } from "@/lib/types";
 
@@ -162,5 +175,48 @@ describe("mutations", () => {
     expect(
       await db.edges.filter((e) => e.from === node.id || e.to === node.id).count(),
     ).toBe(edges);
+  });
+
+  it("stores a link's measured bearing on creation", async () => {
+    const sid = await spaceId();
+    const [a, b] = await db.nodes.filter((n) => n.kind === "point").limit(2).toArray();
+    const edge = await connect(sid, a.id, b.id);
+    expect(edge?.bearing).toBeGreaterThanOrEqual(0);
+    expect(edge?.bearing).toBeLessThan(360);
+    expect(edge?.distance).toBeGreaterThan(0);
+  });
+
+  it("keeps a hand-set distance instead of re-deriving it", async () => {
+    const sid = await spaceId();
+    const [a, b] = await db.nodes.filter((n) => n.kind === "point").limit(2).toArray();
+    const edge = (await connect(sid, a.id, b.id))!;
+    await updateEdge(edge.id, { distance: 7.5, bearing: 42 });
+    const stored = (await db.edges.get(edge.id))!;
+    expect(stored.distance).toBe(7.5);
+    expect(stored.bearing).toBe(42);
+  });
+
+  it("re-measures the links a moved node touches", async () => {
+    const sid = await spaceId();
+    const [a, b] = await db.nodes.filter((n) => n.kind === "point").limit(2).toArray();
+    const edge = (await connect(sid, a.id, b.id))!;
+    // Put b due north of a, five metres away. Canvas y runs down, so north is -y.
+    await updateNode(b.id, { x: a.x, y: a.y - 5 });
+    const touched = await remeasureEdges(sid, [b.id]);
+    expect(touched).toBeGreaterThanOrEqual(1);
+
+    const stored = (await db.edges.get(edge.id))!;
+    expect(stored.distance).toBeCloseTo(5, 5);
+    expect(stored.bearing).toBeCloseTo(0, 5);
+  });
+
+  it("unlinks softly", async () => {
+    const sid = await spaceId();
+    const [a, b] = await db.nodes.filter((n) => n.kind === "point").limit(2).toArray();
+    const edge = (await connect(sid, a.id, b.id))!;
+    await disconnect(edge.id);
+    expect((await db.edges.get(edge.id))!.deleted).toBe(1);
+    // Still there for undo, and re-connecting makes a live link again.
+    expect(await db.edges.get(edge.id)).toBeDefined();
   });
 });

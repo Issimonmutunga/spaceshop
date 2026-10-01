@@ -50,7 +50,7 @@ export default function NodeSheet({
       role="dialog"
       aria-label={node.name}
     >
-      <div className="flex items-start justify-between gap-3 px-4 pt-4">
+      <div className="flex shrink-0 items-start justify-between gap-3 px-4 pt-4">
         <div className="min-w-0">
           <p className="text-caption uppercase tracking-wide text-quiet">
             {KIND_LABEL[node.kind]}
@@ -65,6 +65,8 @@ export default function NodeSheet({
         </Button>
       </div>
 
+      {/* Everything in the middle scrolls, so the actions below never scroll away. */}
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
       {held.length > 0 && (
         <ul className="mt-3 max-h-64 overflow-y-auto px-2">
           {held.slice(0, 24).map((item) => (
@@ -125,14 +127,15 @@ export default function NodeSheet({
       {held.length === 0 && children.length === 0 && (
         <p className="px-4 pt-3 text-body text-quiet">Nothing recorded here yet.</p>
       )}
+      </div>
 
       {actions && (
-        <>
-          <div className="px-4 pt-4">
+        <div className="shrink-0">
+          <div className="px-4 pt-3">
             <Rule />
           </div>
           <div className="flex flex-wrap gap-2 px-4 pt-3">{actions}</div>
-        </>
+        </div>
       )}
     </motion.div>
   );

@@ -10,7 +10,7 @@ import { Can } from "@/lib/role";
 import type { ID } from "@/lib/types";
 import MapCanvas from "@/components/MapCanvas";
 import NodeSheet from "@/components/NodeSheet";
-import { RoundButton } from "@/components/ui";
+import { Button, RoundButton } from "@/components/ui";
 
 /**
  * /map — the whole space, and nothing else. Tap a node for its sheet.
@@ -80,7 +80,7 @@ function MapScreen() {
             label="Add to the map"
             tone="primary"
             className="pointer-events-auto"
-            onClick={() => router.push("/add")}
+            onClick={() => router.push("/edit")}
           >
             <Plus size={22} />
           </RoundButton>
@@ -100,6 +100,25 @@ function MapScreen() {
         edges={edges}
         items={items}
         onClose={() => setSelectedId(null)}
+        actions={
+          selected ? (
+            <>
+              {selected.kind !== "point" && (
+                <Button
+                  size="sm"
+                  onClick={() => router.push(`/edit?new=place&in=${selected.id}`)}
+                >
+                  Add a place here
+                </Button>
+              )}
+              <Can action="edit-map">
+                <Button size="sm" onClick={() => router.push(`/edit?at=${selected.id}`)}>
+                  Edit
+                </Button>
+              </Can>
+            </>
+          ) : null
+        }
       />
     </div>
   );

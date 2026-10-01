@@ -1,6 +1,7 @@
 "use client";
 
 import Dexie, { type EntityTable } from "dexie";
+import { edgeMeasures } from "./draft";
 import { newId, newLabelCode } from "./id";
 import type {
   Edge,
@@ -136,17 +137,48 @@ export async function connect(spaceId: ID, from: ID, to: ID, distance?: number) 
   const b = await db.nodes.get(to);
   if (!a || !b) return null;
   const now = Date.now();
+  const measures = edgeMeasures(a, b);
   const edge: Edge = {
     id: newId("eg"),
     spaceId,
     from,
     to,
-    distance: distance ?? straightDistance(a, b),
+    distance: distance ?? measures.distance,
+    bearing: measures.bearing,
     createdAt: now,
     updatedAt: now,
   };
   await db.edges.add(edge);
   return edge;
+}
+
+/** Soft, so an undo can bring the connection back. */
+export async function disconnect(id: ID) {
+  await db.edges.update(id, { deleted: 1, updatedAt: Date.now() });
+}
+
+export async function updateEdge(id: ID, patch: Partial<Edge>) {
+  await db.edges.update(id, { ...patch, updatedAt: Date.now() });
+}
+
+/**
+ * Re-measures every live link touching the given nodes. A survey is only worth
+ * something if the numbers still describe where things are, so moving a node
+ * has to move its links with it.
+ */
+export async function remeasureEdges(spaceId: ID, nodeIds: ID[]) {
+  const touching = new Set(nodeIds);
+  const edges = await db.edges
+    .filter((e) => !e.deleted && e.spaceId === spaceId && (touching.has(e.from) || touching.has(e.to)))
+    .toArray();
+  await db.transaction("rw", db.nodes, db.edges, async () => {
+    for (const edge of edges) {
+      const [a, b] = await Promise.all([db.nodes.get(edge.from), db.nodes.get(edge.to)]);
+      if (!a || !b) continue;
+      await db.edges.update(edge.id, { ...edgeMeasures(a, b), updatedAt: Date.now() });
+    }
+  });
+  return edges.length;
 }
 
 export const straightDistance = (a: Node, b: Node) =>
