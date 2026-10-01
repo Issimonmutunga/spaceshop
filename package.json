@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "icons": "node scripts/make-icons.mjs",
+    "seed": "node scripts/make-seeds.mjs"
   },
   "dependencies": {
     "dexie": "^4.4.6",
@@ -24,6 +29,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
+    "@rolldown/binding-win32-x64-msvc": "^1.2.12",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.19.0",
     "@types/qrcode": "^1.5.6",

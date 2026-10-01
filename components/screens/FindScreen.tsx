@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, ScanLine, Search, X } from "lucide-react";
+import { Map as MapIcon, Plus, ScanLine, Search, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Can } from "@/lib/role";
 import { RoundButton } from "@/components/ui";
@@ -24,12 +25,22 @@ export default function FindScreen() {
   return (
     <main className="flex min-h-dvh flex-col">
       <header className="safe-t flex items-center justify-between px-6 pt-4">
-        <span
-          aria-label="Locus"
-          className="text-caption tracking-[0.28em] text-ink-quiet uppercase select-none"
+        <Link
+          href="/settings"
+          aria-label="Settings"
+          className="-ml-1 select-none px-1 py-1 text-caption tracking-[0.28em] text-ink-quiet uppercase"
         >
           locus
-        </span>
+        </Link>
+        <Can action="edit-map">
+          <Link
+            href="/map"
+            aria-label="Map"
+            className="-mr-2 flex size-11 items-center justify-center rounded-full text-ink-quiet"
+          >
+            <MapIcon aria-hidden className="size-5" strokeWidth={1.5} />
+          </Link>
+        </Can>
       </header>
 
       <div className="flex flex-1 flex-col justify-center px-6 pb-8">

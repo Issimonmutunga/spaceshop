@@ -1,0 +1,790 @@
+{
+  "space": {
+    "name": "Home"
+  },
+  "nodes": [
+    {
+      "key": "ent",
+      "kind": "point",
+      "name": "Front door",
+      "x": 0,
+      "y": 0,
+      "landmark": true
+    },
+    {
+      "key": "hall",
+      "kind": "point",
+      "name": "Hall junction",
+      "x": 0,
+      "y": -3,
+      "landmark": true
+    },
+    {
+      "key": "kit",
+      "kind": "point",
+      "name": "Kitchen doorway",
+      "x": -6,
+      "y": -3,
+      "landmark": true
+    },
+    {
+      "key": "kit2",
+      "kind": "point",
+      "name": "Kitchen far corner",
+      "x": -6,
+      "y": -9
+    },
+    {
+      "key": "liv",
+      "kind": "point",
+      "name": "Living room doorway",
+      "x": 6,
+      "y": -3,
+      "landmark": true
+    },
+    {
+      "key": "bed",
+      "kind": "point",
+      "name": "Bedroom doorway",
+      "x": 6,
+      "y": -9,
+      "landmark": true
+    },
+    {
+      "key": "gar",
+      "kind": "point",
+      "name": "Garage door",
+      "x": -6,
+      "y": -11,
+      "landmark": true
+    },
+    {
+      "key": "z-hall",
+      "kind": "zone",
+      "name": "Hall",
+      "x": 0,
+      "y": -1,
+      "w": 6,
+      "h": 6
+    },
+    {
+      "key": "z-kitchen",
+      "kind": "zone",
+      "name": "Kitchen",
+      "x": -6,
+      "y": -6,
+      "w": 8,
+      "h": 8
+    },
+    {
+      "key": "z-living",
+      "kind": "zone",
+      "name": "Living room",
+      "x": 7,
+      "y": -4,
+      "w": 8,
+      "h": 7
+    },
+    {
+      "key": "z-bedroom",
+      "kind": "zone",
+      "name": "Bedroom",
+      "x": 8,
+      "y": -9,
+      "w": 7,
+      "h": 7
+    },
+    {
+      "key": "z-garage",
+      "kind": "zone",
+      "name": "Garage",
+      "x": -6,
+      "y": -15,
+      "w": 12,
+      "h": 11
+    },
+    {
+      "key": "coat",
+      "kind": "place",
+      "name": "Coat rack",
+      "x": 0,
+      "y": -1,
+      "parentId": "z-hall"
+    },
+    {
+      "key": "shoes",
+      "kind": "place",
+      "name": "Shoe cupboard",
+      "x": -2,
+      "y": -4.5,
+      "parentId": "z-hall"
+    },
+    {
+      "key": "drawers",
+      "kind": "place",
+      "name": "Drawer unit",
+      "x": -6,
+      "y": -5,
+      "parentId": "z-kitchen"
+    },
+    {
+      "key": "pantry",
+      "kind": "place",
+      "name": "Pantry shelf",
+      "x": -8.5,
+      "y": -8,
+      "parentId": "z-kitchen"
+    },
+    {
+      "key": "fridge",
+      "kind": "place",
+      "name": "Fridge",
+      "x": -3.5,
+      "y": -8.5,
+      "parentId": "z-kitchen"
+    },
+    {
+      "key": "tv",
+      "kind": "place",
+      "name": "TV unit",
+      "x": 6,
+      "y": -3.5,
+      "parentId": "z-living"
+    },
+    {
+      "key": "books",
+      "kind": "place",
+      "name": "Bookshelf",
+      "x": 8.5,
+      "y": -6,
+      "parentId": "z-living"
+    },
+    {
+      "key": "wardrobe",
+      "kind": "place",
+      "name": "Wardrobe",
+      "x": 6.5,
+      "y": -8.5,
+      "parentId": "z-bedroom"
+    },
+    {
+      "key": "bedside",
+      "kind": "place",
+      "name": "Bedside table",
+      "x": 9.5,
+      "y": -10,
+      "parentId": "z-bedroom"
+    },
+    {
+      "key": "toolbox",
+      "kind": "place",
+      "name": "Blue toolbox",
+      "x": -4.5,
+      "y": -12.5,
+      "parentId": "z-garage",
+      "landmark": true
+    },
+    {
+      "key": "bench",
+      "kind": "place",
+      "name": "Workbench",
+      "x": -8.5,
+      "y": -16,
+      "parentId": "z-garage"
+    },
+    {
+      "key": "bikes",
+      "kind": "place",
+      "name": "Bike rack",
+      "x": -3,
+      "y": -17,
+      "parentId": "z-garage"
+    },
+    {
+      "key": "shed",
+      "kind": "place",
+      "name": "Shed shelf",
+      "x": -10,
+      "y": -18.5,
+      "parentId": "z-garage"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ent",
+      "to": "hall"
+    },
+    {
+      "from": "hall",
+      "to": "kit"
+    },
+    {
+      "from": "hall",
+      "to": "liv"
+    },
+    {
+      "from": "kit",
+      "to": "kit2"
+    },
+    {
+      "from": "kit",
+      "to": "gar"
+    },
+    {
+      "from": "liv",
+      "to": "bed"
+    }
+  ],
+  "items": [
+    {
+      "place": "coat",
+      "name": "House keys",
+      "tags": [
+        "keys",
+        "key"
+      ],
+      "slot": "Hook 2",
+      "qty": 2
+    },
+    {
+      "place": "coat",
+      "name": "Umbrella",
+      "tags": [
+        "umbrella"
+      ],
+      "slot": "Hook 4"
+    },
+    {
+      "place": "coat",
+      "name": "Sunglasses",
+      "tags": [
+        "sunglasses",
+        "glasses"
+      ],
+      "slot": "Hook 1"
+    },
+    {
+      "place": "shoes",
+      "name": "Wellies",
+      "tags": [
+        "boots",
+        "wellies"
+      ],
+      "slot": "Bottom shelf",
+      "qty": 2
+    },
+    {
+      "place": "shoes",
+      "name": "Trainers",
+      "tags": [
+        "shoe",
+        "trainers"
+      ],
+      "slot": "Middle shelf"
+    },
+    {
+      "place": "shoes",
+      "name": "Work boots",
+      "tags": [
+        "boots",
+        "work"
+      ],
+      "slot": "Top shelf"
+    },
+    {
+      "place": "drawers",
+      "name": "Spatula",
+      "tags": [
+        "kitchen",
+        "utensil"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "drawers",
+      "name": "Wooden spoon",
+      "tags": [
+        "kitchen",
+        "utensil"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "drawers",
+      "name": "Paring knife",
+      "tags": [
+        "knife",
+        "kitchen"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "drawers",
+      "name": "Chef knife",
+      "tags": [
+        "knife",
+        "kitchen"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "drawers",
+      "name": "Tin opener",
+      "tags": [
+        "kitchen",
+        "opener"
+      ],
+      "slot": "Drawer 3"
+    },
+    {
+      "place": "drawers",
+      "name": "Kitchen scissors",
+      "tags": [
+        "scissors",
+        "kitchen"
+      ],
+      "slot": "Drawer 3"
+    },
+    {
+      "place": "drawers",
+      "name": "Batteries AA",
+      "tags": [
+        "battery",
+        "aa"
+      ],
+      "slot": "Drawer 4"
+    },
+    {
+      "place": "drawers",
+      "name": "Small pliers",
+      "tags": [
+        "pliers",
+        "tool"
+      ],
+      "slot": "Drawer 4"
+    },
+    {
+      "place": "pantry",
+      "name": "Spaghetti 500 g",
+      "tags": [
+        "pasta",
+        "noodle"
+      ],
+      "slot": "Middle shelf"
+    },
+    {
+      "place": "pantry",
+      "name": "Basmati rice 1 kg",
+      "tags": [
+        "rice"
+      ],
+      "slot": "Bottom shelf"
+    },
+    {
+      "place": "pantry",
+      "name": "Rolled oats",
+      "tags": [
+        "oats",
+        "porridge"
+      ],
+      "slot": "Top shelf"
+    },
+    {
+      "place": "pantry",
+      "name": "Chopped tomatoes",
+      "tags": [
+        "tin",
+        "tomato"
+      ],
+      "slot": "Middle shelf",
+      "qty": 3
+    },
+    {
+      "place": "pantry",
+      "name": "Tinned beans",
+      "tags": [
+        "tin",
+        "bean"
+      ],
+      "slot": "Middle shelf"
+    },
+    {
+      "place": "pantry",
+      "name": "Honey jar",
+      "tags": [
+        "honey",
+        "sweet"
+      ],
+      "slot": "Top shelf"
+    },
+    {
+      "place": "fridge",
+      "name": "Milk 2 L",
+      "tags": [
+        "milk",
+        "dairy"
+      ],
+      "slot": "Door"
+    },
+    {
+      "place": "fridge",
+      "name": "Butter",
+      "tags": [
+        "butter",
+        "dairy"
+      ],
+      "slot": "Top shelf"
+    },
+    {
+      "place": "fridge",
+      "name": "Cheddar 400 g",
+      "tags": [
+        "cheese",
+        "cheddar"
+      ],
+      "slot": "Top shelf"
+    },
+    {
+      "place": "fridge",
+      "name": "Greek yoghurt",
+      "tags": [
+        "yoghurt",
+        "dairy"
+      ],
+      "slot": "Middle shelf"
+    },
+    {
+      "place": "fridge",
+      "name": "Salad bag",
+      "tags": [
+        "salad",
+        "vegetable"
+      ],
+      "slot": "Crisper"
+    },
+    {
+      "place": "fridge",
+      "name": "Mustard",
+      "tags": [
+        "mustard",
+        "sauce"
+      ],
+      "slot": "Door"
+    },
+    {
+      "place": "tv",
+      "name": "TV remote",
+      "tags": [
+        "remote",
+        "tv"
+      ],
+      "slot": "Tray"
+    },
+    {
+      "place": "tv",
+      "name": "HDMI cable",
+      "tags": [
+        "cable",
+        "hdmi"
+      ],
+      "slot": "Tray"
+    },
+    {
+      "place": "tv",
+      "name": "Game controller",
+      "tags": [
+        "controller",
+        "game"
+      ],
+      "slot": "Shelf 1"
+    },
+    {
+      "place": "tv",
+      "name": "Spare fuses",
+      "tags": [
+        "fuse"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "books",
+      "name": "Paperback novels",
+      "tags": [
+        "book",
+        "reading"
+      ],
+      "slot": "Shelf 2"
+    },
+    {
+      "place": "books",
+      "name": "Sketchpad",
+      "tags": [
+        "sketch",
+        "drawing"
+      ],
+      "slot": "Shelf 1"
+    },
+    {
+      "place": "books",
+      "name": "Reading lamp",
+      "tags": [
+        "lamp",
+        "light"
+      ],
+      "slot": "Shelf 3"
+    },
+    {
+      "place": "books",
+      "name": "Board games",
+      "tags": [
+        "game",
+        "board"
+      ],
+      "slot": "Bottom shelf"
+    },
+    {
+      "place": "wardrobe",
+      "name": "Winter coat",
+      "tags": [
+        "coat",
+        "winter"
+      ],
+      "slot": "Top rail"
+    },
+    {
+      "place": "wardrobe",
+      "name": "Rain jacket",
+      "tags": [
+        "coat",
+        "rain"
+      ],
+      "slot": "Middle rail"
+    },
+    {
+      "place": "wardrobe",
+      "name": "Hiking boots",
+      "tags": [
+        "boots",
+        "hiking"
+      ],
+      "slot": "Floor"
+    },
+    {
+      "place": "bedside",
+      "name": "Paracetamol",
+      "tags": [
+        "paracetamol",
+        "tablet"
+      ],
+      "slot": "Top"
+    },
+    {
+      "place": "bedside",
+      "name": "Reading glasses",
+      "tags": [
+        "glasses",
+        "reading"
+      ],
+      "slot": "Top"
+    },
+    {
+      "place": "bedside",
+      "name": "Phone charger",
+      "tags": [
+        "charger",
+        "cable"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "bedside",
+      "name": "Notebook and pen",
+      "tags": [
+        "notebook",
+        "pen"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "toolbox",
+      "name": "Socket set",
+      "tags": [
+        "tool",
+        "socket"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "toolbox",
+      "name": "10 mm spanner",
+      "tags": [
+        "spanner",
+        "wrench",
+        "tool"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "toolbox",
+      "name": "Pliers",
+      "tags": [
+        "tool",
+        "pliers"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "toolbox",
+      "name": "Hex key set",
+      "tags": [
+        "tool",
+        "hex"
+      ],
+      "slot": "Drawer 3"
+    },
+    {
+      "place": "toolbox",
+      "name": "Screwdriver set",
+      "tags": [
+        "tool",
+        "screwdriver"
+      ],
+      "slot": "Drawer 3"
+    },
+    {
+      "place": "toolbox",
+      "name": "Gaffer tape",
+      "tags": [
+        "tape",
+        "gaffer"
+      ],
+      "slot": "Drawer 4"
+    },
+    {
+      "place": "toolbox",
+      "name": "Tape measure",
+      "tags": [
+        "tool",
+        "measure"
+      ],
+      "slot": "Drawer 5"
+    },
+    {
+      "place": "toolbox",
+      "name": "Cable ties",
+      "tags": [
+        "cable tie",
+        "tie"
+      ],
+      "slot": "Drawer 5"
+    },
+    {
+      "place": "bench",
+      "name": "Clamp",
+      "tags": [
+        "tool",
+        "clamp"
+      ],
+      "slot": "Clamp rack"
+    },
+    {
+      "place": "bench",
+      "name": "Sandpaper",
+      "tags": [
+        "sandpaper",
+        "abrasive"
+      ],
+      "slot": "Shelf 2"
+    },
+    {
+      "place": "bench",
+      "name": "Wood screws",
+      "tags": [
+        "screw",
+        "fixing"
+      ],
+      "slot": "Box 2"
+    },
+    {
+      "place": "bench",
+      "name": "Hammer",
+      "tags": [
+        "tool",
+        "hammer"
+      ],
+      "slot": "Clamp rack"
+    },
+    {
+      "place": "bench",
+      "name": "Work gloves",
+      "tags": [
+        "glove",
+        "work"
+      ],
+      "slot": "Hook 2"
+    },
+    {
+      "place": "bikes",
+      "name": "Bike pump",
+      "tags": [
+        "bike",
+        "pump"
+      ],
+      "slot": "Hook 1"
+    },
+    {
+      "place": "bikes",
+      "name": "Spare inner tube",
+      "tags": [
+        "bike",
+        "tube"
+      ],
+      "slot": "Hook 2"
+    },
+    {
+      "place": "bikes",
+      "name": "Helmet",
+      "tags": [
+        "bike",
+        "helmet"
+      ],
+      "slot": "Shelf 1"
+    },
+    {
+      "place": "shed",
+      "name": "Potting soil",
+      "tags": [
+        "garden",
+        "soil"
+      ],
+      "slot": "Bottom shelf"
+    },
+    {
+      "place": "shed",
+      "name": "Watering can",
+      "tags": [
+        "garden",
+        "water"
+      ],
+      "slot": "Floor"
+    },
+    {
+      "place": "shed",
+      "name": "Garden twine",
+      "tags": [
+        "garden",
+        "twine"
+      ],
+      "slot": "Shelf 2"
+    },
+    {
+      "place": "shed",
+      "name": "Bulbs",
+      "tags": [
+        "garden",
+        "bulb"
+      ],
+      "slot": "Shelf 1"
+    }
+  ]
+}

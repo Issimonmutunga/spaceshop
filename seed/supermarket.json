@@ -1,0 +1,1297 @@
+{
+  "space": {
+    "name": "Greenfield Market"
+  },
+  "nodes": [
+    {
+      "key": "ent",
+      "kind": "point",
+      "name": "Entrance doors",
+      "x": 0,
+      "y": 0,
+      "landmark": true
+    },
+    {
+      "key": "front",
+      "kind": "point",
+      "name": "Front cross aisle",
+      "x": 0,
+      "y": -6,
+      "landmark": true
+    },
+    {
+      "key": "back",
+      "kind": "point",
+      "name": "Back cross aisle",
+      "x": 0,
+      "y": -24,
+      "landmark": true
+    },
+    {
+      "key": "bakery",
+      "kind": "point",
+      "name": "Bakery junction",
+      "x": 11,
+      "y": -6,
+      "landmark": true
+    },
+    {
+      "key": "pharm",
+      "kind": "point",
+      "name": "Pharmacy junction",
+      "x": 0,
+      "y": -29,
+      "landmark": true
+    },
+    {
+      "key": "checkout",
+      "kind": "point",
+      "name": "Checkout junction",
+      "x": -11,
+      "y": -3,
+      "landmark": true
+    },
+    {
+      "key": "entrance",
+      "kind": "zone",
+      "name": "Entrance",
+      "x": 0,
+      "y": 1,
+      "w": 11,
+      "h": 5
+    },
+    {
+      "key": "bakeryzone",
+      "kind": "zone",
+      "name": "Bakery",
+      "x": 11,
+      "y": -3,
+      "w": 6,
+      "h": 7
+    },
+    {
+      "key": "pharmacyzone",
+      "kind": "zone",
+      "name": "Pharmacy",
+      "x": -11,
+      "y": -29,
+      "w": 7,
+      "h": 5
+    },
+    {
+      "key": "checkoutzone",
+      "kind": "zone",
+      "name": "Checkout",
+      "x": -11,
+      "y": -6,
+      "w": 7,
+      "h": 6
+    },
+    {
+      "key": "stockzone",
+      "kind": "zone",
+      "name": "Stockroom",
+      "x": -11,
+      "y": -17,
+      "w": 7,
+      "h": 8
+    },
+    {
+      "key": "p-a1-front",
+      "kind": "point",
+      "name": "Aisle 1 head",
+      "x": -9,
+      "y": -6
+    },
+    {
+      "key": "p-a1-back",
+      "kind": "point",
+      "name": "Aisle 1 rear",
+      "x": -9,
+      "y": -24
+    },
+    {
+      "key": "a1",
+      "kind": "zone",
+      "name": "Aisle 1 Grocery",
+      "x": -9,
+      "y": -15,
+      "w": 4.4,
+      "h": 18
+    },
+    {
+      "key": "p-a2-front",
+      "kind": "point",
+      "name": "Aisle 2 head",
+      "x": -3,
+      "y": -6
+    },
+    {
+      "key": "p-a2-back",
+      "kind": "point",
+      "name": "Aisle 2 rear",
+      "x": -3,
+      "y": -24
+    },
+    {
+      "key": "a2",
+      "kind": "zone",
+      "name": "Aisle 2 Drinks",
+      "x": -3,
+      "y": -15,
+      "w": 4.4,
+      "h": 18
+    },
+    {
+      "key": "p-a3-front",
+      "kind": "point",
+      "name": "Aisle 3 head",
+      "x": 3,
+      "y": -6
+    },
+    {
+      "key": "p-a3-back",
+      "kind": "point",
+      "name": "Aisle 3 rear",
+      "x": 3,
+      "y": -24
+    },
+    {
+      "key": "a3",
+      "kind": "zone",
+      "name": "Aisle 3 Household",
+      "x": 3,
+      "y": -15,
+      "w": 4.4,
+      "h": 18
+    },
+    {
+      "key": "p-a4-front",
+      "kind": "point",
+      "name": "Aisle 4 head",
+      "x": 9,
+      "y": -6
+    },
+    {
+      "key": "p-a4-back",
+      "kind": "point",
+      "name": "Aisle 4 rear",
+      "x": 9,
+      "y": -24
+    },
+    {
+      "key": "a4",
+      "kind": "zone",
+      "name": "Aisle 4 Frozen and chilled",
+      "x": 9,
+      "y": -15,
+      "w": 4.4,
+      "h": 18
+    },
+    {
+      "key": "baskets",
+      "kind": "place",
+      "name": "Basket stack",
+      "x": 0,
+      "y": 1.5,
+      "parentId": "entrance"
+    },
+    {
+      "key": "services",
+      "kind": "place",
+      "name": "Customer services",
+      "x": 0,
+      "y": -1.5,
+      "parentId": "entrance"
+    },
+    {
+      "key": "bread",
+      "kind": "place",
+      "name": "Bread rack",
+      "x": 11,
+      "y": -4.5,
+      "parentId": "bakeryzone"
+    },
+    {
+      "key": "pastry",
+      "kind": "place",
+      "name": "Pastry case",
+      "x": 11,
+      "y": -1.5,
+      "parentId": "bakeryzone"
+    },
+    {
+      "key": "pasta",
+      "kind": "place",
+      "name": "Shelf 1 left",
+      "x": -9,
+      "y": -9,
+      "parentId": "a1"
+    },
+    {
+      "key": "cereal",
+      "kind": "place",
+      "name": "Shelf 1 right",
+      "x": -9,
+      "y": -9,
+      "parentId": "a1"
+    },
+    {
+      "key": "tins",
+      "kind": "place",
+      "name": "Shelf 2 left",
+      "x": -9,
+      "y": -15,
+      "parentId": "a1"
+    },
+    {
+      "key": "snacks",
+      "kind": "place",
+      "name": "Shelf 2 right",
+      "x": -9,
+      "y": -15,
+      "parentId": "a1"
+    },
+    {
+      "key": "spice",
+      "kind": "place",
+      "name": "Shelf 3",
+      "x": -9,
+      "y": -20,
+      "parentId": "a1"
+    },
+    {
+      "key": "water",
+      "kind": "place",
+      "name": "Shelf 1 left",
+      "x": -3,
+      "y": -9,
+      "parentId": "a2"
+    },
+    {
+      "key": "juice",
+      "kind": "place",
+      "name": "Shelf 1 right",
+      "x": -3,
+      "y": -9,
+      "parentId": "a2"
+    },
+    {
+      "key": "coffee",
+      "kind": "place",
+      "name": "Shelf 2",
+      "x": -3,
+      "y": -15,
+      "parentId": "a2"
+    },
+    {
+      "key": "mixers",
+      "kind": "place",
+      "name": "Shelf 3",
+      "x": -3,
+      "y": -20,
+      "parentId": "a2"
+    },
+    {
+      "key": "cleaning",
+      "kind": "place",
+      "name": "Shelf 1",
+      "x": 3,
+      "y": -9,
+      "parentId": "a3"
+    },
+    {
+      "key": "paper",
+      "kind": "place",
+      "name": "Shelf 2",
+      "x": 3,
+      "y": -15,
+      "parentId": "a3"
+    },
+    {
+      "key": "wrap",
+      "kind": "place",
+      "name": "Shelf 3",
+      "x": 3,
+      "y": -20,
+      "parentId": "a3"
+    },
+    {
+      "key": "meals",
+      "kind": "place",
+      "name": "Shelf 1",
+      "x": 9,
+      "y": -9,
+      "parentId": "a4"
+    },
+    {
+      "key": "veg",
+      "kind": "place",
+      "name": "Shelf 2",
+      "x": 9,
+      "y": -15,
+      "parentId": "a4"
+    },
+    {
+      "key": "dairy",
+      "kind": "place",
+      "name": "Shelf 3",
+      "x": 9,
+      "y": -20,
+      "parentId": "a4"
+    },
+    {
+      "key": "meds",
+      "kind": "place",
+      "name": "Shelf 1",
+      "x": -11,
+      "y": -29,
+      "parentId": "pharmacyzone"
+    },
+    {
+      "key": "firstaid",
+      "kind": "place",
+      "name": "First aid drawer",
+      "x": -11,
+      "y": -28,
+      "parentId": "pharmacyzone"
+    },
+    {
+      "key": "till1",
+      "kind": "place",
+      "name": "Till 1",
+      "x": -11,
+      "y": -5,
+      "parentId": "checkoutzone"
+    },
+    {
+      "key": "till2",
+      "kind": "place",
+      "name": "Till 2",
+      "x": -11,
+      "y": -6,
+      "parentId": "checkoutzone"
+    },
+    {
+      "key": "till3",
+      "kind": "place",
+      "name": "Till 3",
+      "x": -11,
+      "y": -7,
+      "parentId": "checkoutzone"
+    },
+    {
+      "key": "rackA",
+      "kind": "place",
+      "name": "Rack A",
+      "x": -11,
+      "y": -16,
+      "parentId": "stockzone"
+    },
+    {
+      "key": "rackB",
+      "kind": "place",
+      "name": "Rack B",
+      "x": -11,
+      "y": -18,
+      "parentId": "stockzone"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ent",
+      "to": "front"
+    },
+    {
+      "from": "front",
+      "to": "back"
+    },
+    {
+      "from": "front",
+      "to": "checkout"
+    },
+    {
+      "from": "front",
+      "to": "bakery"
+    },
+    {
+      "from": "back",
+      "to": "pharm"
+    },
+    {
+      "from": "front",
+      "to": "p-a1-front"
+    },
+    {
+      "from": "back",
+      "to": "p-a1-back"
+    },
+    {
+      "from": "p-a1-front",
+      "to": "p-a1-back"
+    },
+    {
+      "from": "front",
+      "to": "p-a2-front"
+    },
+    {
+      "from": "back",
+      "to": "p-a2-back"
+    },
+    {
+      "from": "p-a2-front",
+      "to": "p-a2-back"
+    },
+    {
+      "from": "front",
+      "to": "p-a3-front"
+    },
+    {
+      "from": "back",
+      "to": "p-a3-back"
+    },
+    {
+      "from": "p-a3-front",
+      "to": "p-a3-back"
+    },
+    {
+      "from": "front",
+      "to": "p-a4-front"
+    },
+    {
+      "from": "back",
+      "to": "p-a4-back"
+    },
+    {
+      "from": "p-a4-front",
+      "to": "p-a4-back"
+    }
+  ],
+  "items": [
+    {
+      "place": "baskets",
+      "name": "Shopping basket",
+      "tags": [
+        "basket",
+        "trolley"
+      ],
+      "slot": "Left stack",
+      "qty": 24
+    },
+    {
+      "place": "baskets",
+      "name": "Trolley coin",
+      "tags": [
+        "trolley",
+        "coin"
+      ],
+      "slot": "Till drawer",
+      "qty": 40
+    },
+    {
+      "place": "services",
+      "name": "Wheelchair",
+      "tags": [
+        "access"
+      ],
+      "slot": "Left bay",
+      "qty": 2
+    },
+    {
+      "place": "services",
+      "name": "Store leaflet",
+      "tags": [
+        "leaflet",
+        "flyer"
+      ],
+      "slot": "Rack"
+    },
+    {
+      "place": "services",
+      "name": "Lost property box",
+      "tags": [
+        "lost",
+        "property"
+      ],
+      "slot": "Back office"
+    },
+    {
+      "place": "bread",
+      "name": "Sourdough loaf",
+      "tags": [
+        "bread",
+        "loaf"
+      ],
+      "slot": "Middle"
+    },
+    {
+      "place": "bread",
+      "name": "Wholemeal loaf",
+      "tags": [
+        "bread",
+        "brown"
+      ],
+      "slot": "Left"
+    },
+    {
+      "place": "bread",
+      "name": "Baguette",
+      "tags": [
+        "bread",
+        "french"
+      ],
+      "slot": "Right"
+    },
+    {
+      "place": "bread",
+      "name": "Bagel 5-pack",
+      "tags": [
+        "bread",
+        "bagel"
+      ],
+      "slot": "Top shelf"
+    },
+    {
+      "place": "pastry",
+      "name": "Butter croissant",
+      "tags": [
+        "pastry",
+        "croissant"
+      ],
+      "slot": "Left"
+    },
+    {
+      "place": "pastry",
+      "name": "Pain au chocolat",
+      "tags": [
+        "pastry",
+        "chocolate"
+      ],
+      "slot": "Centre"
+    },
+    {
+      "place": "pastry",
+      "name": "Almond tart",
+      "tags": [
+        "pastry",
+        "tart"
+      ],
+      "slot": "Right"
+    },
+    {
+      "place": "pastry",
+      "name": "Cinnamon bun",
+      "tags": [
+        "pastry",
+        "bun"
+      ],
+      "slot": "Back"
+    },
+    {
+      "place": "pasta",
+      "name": "Spaghetti 500 g",
+      "tags": [
+        "pasta",
+        "noodle"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "pasta",
+      "name": "Penne 500 g",
+      "tags": [
+        "pasta",
+        "noodle"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "pasta",
+      "name": "Basmati rice 1 kg",
+      "tags": [
+        "rice"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "pasta",
+      "name": "Pasta sauce jar",
+      "tags": [
+        "pasta",
+        "sauce"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "cereal",
+      "name": "Cornflakes 500 g",
+      "tags": [
+        "cereal",
+        "breakfast"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "cereal",
+      "name": "Rolled oats 1 kg",
+      "tags": [
+        "oats",
+        "porridge"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "cereal",
+      "name": "Muesli 500 g",
+      "tags": [
+        "cereal",
+        "muesli"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "cereal",
+      "name": "Honey 250 g",
+      "tags": [
+        "honey",
+        "sweet"
+      ],
+      "slot": "Level 5"
+    },
+    {
+      "place": "tins",
+      "name": "Chopped tomatoes",
+      "tags": [
+        "tin",
+        "tomato"
+      ],
+      "slot": "Level 3",
+      "qty": 12
+    },
+    {
+      "place": "tins",
+      "name": "Chickpeas",
+      "tags": [
+        "tin",
+        "pulse"
+      ],
+      "slot": "Level 3",
+      "qty": 9
+    },
+    {
+      "place": "tins",
+      "name": "Tuna chunks",
+      "tags": [
+        "tin",
+        "fish"
+      ],
+      "slot": "Level 2",
+      "qty": 7
+    },
+    {
+      "place": "tins",
+      "name": "Baked beans",
+      "tags": [
+        "tin",
+        "bean"
+      ],
+      "slot": "Level 2",
+      "qty": 11
+    },
+    {
+      "place": "tins",
+      "name": "Coconut milk",
+      "tags": [
+        "tin",
+        "coconut"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "snacks",
+      "name": "Salted crisps",
+      "tags": [
+        "crisp",
+        "snack"
+      ],
+      "slot": "Level 3",
+      "qty": 14
+    },
+    {
+      "place": "snacks",
+      "name": "Dark chocolate 70%",
+      "tags": [
+        "chocolate",
+        "sweet"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "snacks",
+      "name": "Roasted almonds",
+      "tags": [
+        "nuts",
+        "snack"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "snacks",
+      "name": "Oat biscuits",
+      "tags": [
+        "biscuit",
+        "cookie"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "spice",
+      "name": "Ground cinnamon",
+      "tags": [
+        "spice"
+      ],
+      "slot": "Jar 3"
+    },
+    {
+      "place": "spice",
+      "name": "Black peppercorns",
+      "tags": [
+        "spice",
+        "pepper"
+      ],
+      "slot": "Jar 7"
+    },
+    {
+      "place": "spice",
+      "name": "Paprika jar",
+      "tags": [
+        "spice"
+      ],
+      "slot": "Jar 11"
+    },
+    {
+      "place": "spice",
+      "name": "Bay leaves",
+      "tags": [
+        "spice",
+        "herb"
+      ],
+      "slot": "Jar 2"
+    },
+    {
+      "place": "water",
+      "name": "Still water 6-pack",
+      "tags": [
+        "water",
+        "drink"
+      ],
+      "slot": "Floor",
+      "qty": 8
+    },
+    {
+      "place": "water",
+      "name": "Sparkling water 6-pack",
+      "tags": [
+        "water",
+        "sparkling"
+      ],
+      "slot": "Floor",
+      "qty": 4
+    },
+    {
+      "place": "juice",
+      "name": "Orange juice 1 L",
+      "tags": [
+        "juice",
+        "orange"
+      ],
+      "slot": "Level 2",
+      "qty": 6
+    },
+    {
+      "place": "juice",
+      "name": "Apple juice 1 L",
+      "tags": [
+        "juice",
+        "apple"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "juice",
+      "name": "Mango smoothie",
+      "tags": [
+        "juice",
+        "smoothie"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "coffee",
+      "name": "Ground coffee 500 g",
+      "tags": [
+        "coffee"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "coffee",
+      "name": "Tea bags 80",
+      "tags": [
+        "tea",
+        "teabag"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "coffee",
+      "name": "Instant coffee jar",
+      "tags": [
+        "coffee",
+        "instant"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "coffee",
+      "name": "Herbal tea",
+      "tags": [
+        "tea",
+        "herbal"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "mixers",
+      "name": "Cola 6-pack",
+      "tags": [
+        "cola",
+        "drink"
+      ],
+      "slot": "Floor",
+      "qty": 6
+    },
+    {
+      "place": "mixers",
+      "name": "Ginger ale",
+      "tags": [
+        "drink",
+        "ginger"
+      ],
+      "slot": "Floor"
+    },
+    {
+      "place": "mixers",
+      "name": "Lemonade",
+      "tags": [
+        "drink",
+        "lemon"
+      ],
+      "slot": "Level 1"
+    },
+    {
+      "place": "cleaning",
+      "name": "Washing-up liquid",
+      "tags": [
+        "washing up",
+        "dish"
+      ],
+      "slot": "Level 2",
+      "qty": 6
+    },
+    {
+      "place": "cleaning",
+      "name": "Surface spray",
+      "tags": [
+        "cleaning",
+        "spray"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "cleaning",
+      "name": "Bleach 1 L",
+      "tags": [
+        "cleaning",
+        "bleach"
+      ],
+      "slot": "Level 1"
+    },
+    {
+      "place": "cleaning",
+      "name": "Dishwasher tablets",
+      "tags": [
+        "dishwasher",
+        "tablet"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "paper",
+      "name": "Kitchen roll 6-pack",
+      "tags": [
+        "kitchen roll",
+        "paper"
+      ],
+      "slot": "Level 3",
+      "qty": 5
+    },
+    {
+      "place": "paper",
+      "name": "Toilet roll 9-pack",
+      "tags": [
+        "toilet roll",
+        "paper"
+      ],
+      "slot": "Level 2",
+      "qty": 8
+    },
+    {
+      "place": "paper",
+      "name": "Kitchen towel",
+      "tags": [
+        "paper towel"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "wrap",
+      "name": "Cling film",
+      "tags": [
+        "cling film",
+        "wrap"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "wrap",
+      "name": "Aluminium foil 10 m",
+      "tags": [
+        "foil",
+        "wrap"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "wrap",
+      "name": "Food bags",
+      "tags": [
+        "bag",
+        "wrap"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "wrap",
+      "name": "Cling clips",
+      "tags": [
+        "clip",
+        "wrap"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "meals",
+      "name": "Frozen pizza",
+      "tags": [
+        "frozen",
+        "pizza"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "meals",
+      "name": "Fish fingers",
+      "tags": [
+        "frozen",
+        "fish"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "meals",
+      "name": "Oven chips",
+      "tags": [
+        "frozen",
+        "chips"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "veg",
+      "name": "Stir-fry mix",
+      "tags": [
+        "frozen",
+        "vegetable"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "veg",
+      "name": "Spinach blocks",
+      "tags": [
+        "frozen",
+        "spinach"
+      ],
+      "slot": "Level 5"
+    },
+    {
+      "place": "veg",
+      "name": "Peas",
+      "tags": [
+        "frozen",
+        "peas"
+      ],
+      "slot": "Level 4"
+    },
+    {
+      "place": "dairy",
+      "name": "Whole milk 2 L",
+      "tags": [
+        "milk",
+        "dairy"
+      ],
+      "slot": "Floor",
+      "qty": 6
+    },
+    {
+      "place": "dairy",
+      "name": "Butter block",
+      "tags": [
+        "butter",
+        "dairy"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "dairy",
+      "name": "Mature cheddar 400 g",
+      "tags": [
+        "cheese",
+        "cheddar"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "dairy",
+      "name": "Greek yoghurt 500 g",
+      "tags": [
+        "yoghurt",
+        "dairy"
+      ],
+      "slot": "Level 1"
+    },
+    {
+      "place": "dairy",
+      "name": "Double cream",
+      "tags": [
+        "cream",
+        "dairy"
+      ],
+      "slot": "Level 1"
+    },
+    {
+      "place": "meds",
+      "name": "Paracetamol 500 mg",
+      "tags": [
+        "paracetamol",
+        "painkiller",
+        "tablet"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "meds",
+      "name": "Ibuprofen 200 mg",
+      "tags": [
+        "ibuprofen",
+        "painkiller"
+      ],
+      "slot": "Level 2"
+    },
+    {
+      "place": "meds",
+      "name": "Cough syrup",
+      "tags": [
+        "cough",
+        "syrup"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "meds",
+      "name": "Antacid tablets",
+      "tags": [
+        "antacid",
+        "stomach"
+      ],
+      "slot": "Level 3"
+    },
+    {
+      "place": "firstaid",
+      "name": "Plasters",
+      "tags": [
+        "plaster",
+        "first aid"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "firstaid",
+      "name": "Antiseptic cream",
+      "tags": [
+        "first aid",
+        "cream"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "firstaid",
+      "name": "Burn gel",
+      "tags": [
+        "first aid",
+        "burn"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "firstaid",
+      "name": "Thermometer",
+      "tags": [
+        "first aid",
+        "temperature"
+      ],
+      "slot": "Drawer 3"
+    },
+    {
+      "place": "till1",
+      "name": "Tape measure",
+      "tags": [
+        "tool",
+        "measure"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "till1",
+      "name": "Spare till roll",
+      "tags": [
+        "till",
+        "receipt"
+      ],
+      "slot": "Drawer 2"
+    },
+    {
+      "place": "till1",
+      "name": "Phone charger",
+      "tags": [
+        "charger",
+        "cable"
+      ],
+      "slot": "Counter"
+    },
+    {
+      "place": "till2",
+      "name": "Screwdriver small",
+      "tags": [
+        "tool",
+        "screwdriver"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "till2",
+      "name": "Safety cutter",
+      "tags": [
+        "tool",
+        "cutter"
+      ],
+      "slot": "Drawer 1"
+    },
+    {
+      "place": "till2",
+      "name": "Umbrella",
+      "tags": [
+        "umbrella"
+      ],
+      "slot": "Side"
+    },
+    {
+      "place": "till3",
+      "name": "Reusable bags",
+      "tags": [
+        "bag",
+        "reusable"
+      ],
+      "slot": "Under till",
+      "qty": 30
+    },
+    {
+      "place": "till3",
+      "name": "Mint gum",
+      "tags": [
+        "gum",
+        "mint"
+      ],
+      "slot": "Counter"
+    },
+    {
+      "place": "rackA",
+      "name": "Toilet roll bulk 48",
+      "tags": [
+        "toilet roll",
+        "bulk"
+      ],
+      "slot": "Rack A1",
+      "qty": 20
+    },
+    {
+      "place": "rackA",
+      "name": "Water crate",
+      "tags": [
+        "water",
+        "bulk"
+      ],
+      "slot": "Floor",
+      "qty": 6
+    },
+    {
+      "place": "rackA",
+      "name": "Crisp boxes",
+      "tags": [
+        "bulk",
+        "snack"
+      ],
+      "slot": "Rack A3",
+      "qty": 12
+    },
+    {
+      "place": "rackB",
+      "name": "Price gun labels",
+      "tags": [
+        "label",
+        "price"
+      ],
+      "slot": "Bin 3",
+      "qty": 40
+    },
+    {
+      "place": "rackB",
+      "name": "Batteries AA 24",
+      "tags": [
+        "battery",
+        "aa"
+      ],
+      "slot": "Bin 1"
+    },
+    {
+      "place": "rackB",
+      "name": "Light bulbs",
+      "tags": [
+        "bulb",
+        "light"
+      ],
+      "slot": "Bin 2"
+    }
+  ]
+}
