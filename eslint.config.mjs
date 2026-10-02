@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Build output and coverage are not source.
+    ".vercel/**",
+    "coverage/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
   {
     rules: {
