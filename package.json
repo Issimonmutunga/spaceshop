@@ -43,6 +43,6 @@
     "vitest": "^5.0.3"
   },
   "overrides": {
-    "@rolldown/binding-win32-x64-msvc": "@rolldown/binding-linux-x64-gnu"
+    "@rolldown/binding-win32-x64-msvc": "npm:@rolldown/binding-linux-x64-gnu@*"
   }
 }
