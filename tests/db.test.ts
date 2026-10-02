@@ -4,6 +4,7 @@ import homeSeed from "@/seed/home.json";
 import {
   db,
   addItem,
+  createNode,
   removeItem,
   restoreItem,
   undoAdd,
@@ -50,6 +51,10 @@ describe("seed loading", () => {
       expect(nodeIds.has(edge.from)).toBe(true);
       expect(nodeIds.has(edge.to)).toBe(true);
       expect(edge.distance).toBeGreaterThan(0);
+      // A seed file says which places are joined, so the survey of that link is
+      // measured on import. Otherwise every seeded link arrives with no bearing.
+      expect(edge.bearing).toBeGreaterThanOrEqual(0);
+      expect(edge.bearing).toBeLessThan(360);
     }
   });
 
@@ -179,11 +184,14 @@ describe("mutations", () => {
 
   it("stores a link's measured bearing on creation", async () => {
     const sid = await spaceId();
-    const [a, b] = await db.nodes.filter((n) => n.kind === "point").limit(2).toArray();
+    // Two fresh points, so this measures a new link rather than returning a
+    // seeded one that may already join the same two places.
+    const a = await createNode(sid, { kind: "point", name: "A", x: 0, y: 0, parentId: null });
+    const b = await createNode(sid, { kind: "point", name: "B", x: 0, y: -3, parentId: null });
     const edge = await connect(sid, a.id, b.id);
     expect(edge?.bearing).toBeGreaterThanOrEqual(0);
     expect(edge?.bearing).toBeLessThan(360);
-    expect(edge?.distance).toBeGreaterThan(0);
+    expect(edge?.distance).toBe(3);
   });
 
   it("keeps a hand-set distance instead of re-deriving it", async () => {
@@ -198,12 +206,13 @@ describe("mutations", () => {
 
   it("re-measures the links a moved node touches", async () => {
     const sid = await spaceId();
-    const [a, b] = await db.nodes.filter((n) => n.kind === "point").limit(2).toArray();
+    const a = await createNode(sid, { kind: "point", name: "A", x: 0, y: 0, parentId: null });
+    const b = await createNode(sid, { kind: "point", name: "B", x: 2, y: 1, parentId: null });
     const edge = (await connect(sid, a.id, b.id))!;
     // Put b due north of a, five metres away. Canvas y runs down, so north is -y.
     await updateNode(b.id, { x: a.x, y: a.y - 5 });
     const touched = await remeasureEdges(sid, [b.id]);
-    expect(touched).toBeGreaterThanOrEqual(1);
+    expect(touched).toBe(1);
 
     const stored = (await db.edges.get(edge.id))!;
     expect(stored.distance).toBeCloseTo(5, 5);

@@ -8,6 +8,7 @@ import {
   measures,
   nextName,
   parentFor,
+  roundBearing,
   problems,
   rectFromDrag,
   zoneAt,
@@ -109,6 +110,18 @@ describe("measurements", () => {
     expect(Number.isInteger(m.distance * 10)).toBe(true);
     expect(m.bearing).toBeGreaterThanOrEqual(0);
     expect(m.bearing).toBeLessThan(360);
+  });
+
+  it("keeps a rounded bearing inside the circle", () => {
+    // Due east by a hair less than half a degree: rounding lands on 360 unless
+    // the wrap is applied after the rounding.
+    const justSouthOfEast = edgeMeasures(
+      node({ id: "a", x: 0, y: 0 }),
+      node({ id: "b", x: 10, y: 0.04 }),
+    );
+    expect(justSouthOfEast.bearing).toBe(90.2);
+    expect(roundBearing(360)).toBe(0);
+    expect(roundBearing(-0.4)).toBe(359.6);
   });
 });
 

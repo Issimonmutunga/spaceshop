@@ -2,7 +2,8 @@
 
 import supermarketSeed from "@/seed/supermarket.json";
 import homeSeed from "@/seed/home.json";
-import { db, createSpace, straightDistance } from "./db";
+import { db, createSpace } from "./db";
+import { edgeMeasures } from "./draft";
 import { newId, newLabelCode } from "./id";
 import type { Edge, ID, Item, Node, SeedFile } from "./types";
 
@@ -71,7 +72,9 @@ export async function importSeedFile(seed: SeedFile) {
       spaceId: space.id,
       from,
       to,
-      distance: straightDistance(a, b),
+      // Seed files list which places are joined, not how far apart they are,
+      // so a survey is measured here exactly as it would be by hand.
+      ...edgeMeasures(a, b),
       createdAt: now,
       updatedAt: now,
     });

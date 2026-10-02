@@ -80,9 +80,18 @@ export function measures(a: Point, b: Point) {
 /** The same measurements, rounded for display and for storage. */
 export const roundMeasure = (value: number) => Math.round(value * 10) / 10;
 
+/**
+ * A rounded bearing that is still a bearing. Rounding a normalized angle can
+ * land on 360, and nothing downstream should ever have to know that.
+ */
+export const roundBearing = (deg: number) => {
+  const rounded = roundMeasure(deg) % 360;
+  return rounded < 0 ? rounded + 360 : rounded;
+};
+
 export const edgeMeasures = (a: Node, b: Node) => {
   const m = measures(a, b);
-  return { distance: roundMeasure(m.distance), bearing: roundMeasure(m.bearing) };
+  return { distance: roundMeasure(m.distance), bearing: roundBearing(m.bearing) };
 };
 
 /** "Zone 3": names people can say out loud, numbered from what exists. */
